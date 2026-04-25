@@ -9,8 +9,13 @@ const StudentDashboard = () => {
   const [marks, setMarks] = useState(null);
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const token = localStorage.getItem('token');
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   useEffect(() => {
     fetchStudentData();
@@ -45,10 +50,10 @@ const StudentDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar role="student" />
+      <Sidebar role="student" isOpen={sidebarOpen} />
 
-      <div className="flex-1 flex flex-col">
-        <Navbar role="student" />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Navbar role="student" toggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
 
         <div className="flex-1 overflow-auto p-6">
           <div className="max-w-6xl mx-auto">

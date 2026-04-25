@@ -9,12 +9,17 @@ const TeacherDashboard = () => {
   const [students, setStudents] = useState([]);
   const [activeTab, setActiveTab] = useState('attendance');
   const [loading, setLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [attendanceDate, setAttendanceDate] = useState(
     new Date().toISOString().split('T')[0]
   );
   const [marksData, setMarksData] = useState({});
 
   const token = localStorage.getItem('token');
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   useEffect(() => {
     fetchClassStudents();
@@ -91,10 +96,10 @@ const TeacherDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar role="teacher" />
+      <Sidebar role="teacher" isOpen={sidebarOpen} />
 
-      <div className="flex-1 flex flex-col">
-        <Navbar role="teacher" />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Navbar role="teacher" toggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
 
         <div className="flex-1 overflow-auto p-6">
           <div className="max-w-6xl mx-auto">

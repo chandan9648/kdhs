@@ -9,8 +9,13 @@ const AdminDashboard = () => {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const token = localStorage.getItem('token');
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   const [formData, setFormData] = useState({
     name: '',
@@ -117,10 +122,10 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar role="admin" />
+      <Sidebar role="admin" isOpen={sidebarOpen} />
 
-      <div className="flex-1 flex flex-col">
-        <Navbar role="admin" />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Navbar role="admin" toggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
 
         <div className="flex-1 overflow-auto p-6">
           <div className="max-w-7xl mx-auto">
