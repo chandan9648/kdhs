@@ -65,7 +65,17 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('/api/admin/student', formData, config);
+      
+      // Prepare data for student (exclude teacher fields)
+      const studentData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        class: formData.class,
+        rollNo: parseInt(formData.rollNo) || 0, // Convert to number
+      };
+
+      const response = await axios.post('/api/admin/student', studentData, config);
       alert('✅ Student added successfully');
       setFormData({
         name: '',
@@ -79,8 +89,8 @@ const AdminDashboard = () => {
       setShowAddForm(false);
       fetchStudents();
     } catch (error) {
-      console.error('Error adding student:', error);
-      alert('❌ Error adding student');
+      console.error('Error adding student:', error.response?.data || error.message);
+      alert(`❌ Error: ${error.response?.data?.message || 'Failed to add student'}`);
     }
   };
 
@@ -88,7 +98,17 @@ const AdminDashboard = () => {
     e.preventDefault();
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post('/api/admin/teacher', formData, config);
+      
+      // Prepare data for teacher (exclude student fields)
+      const teacherData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        subject: formData.subject,
+        qualifications: formData.qualifications,
+      };
+
+      const response = await axios.post('/api/admin/teacher', teacherData, config);
       alert('✅ Teacher added successfully');
       setFormData({
         name: '',
@@ -102,8 +122,8 @@ const AdminDashboard = () => {
       setShowAddForm(false);
       fetchTeachers();
     } catch (error) {
-      console.error('Error adding teacher:', error);
-      alert('❌ Error adding teacher');
+      console.error('Error adding teacher:', error.response?.data || error.message);
+      alert(`❌ Error: ${error.response?.data?.message || 'Failed to add teacher'}`);
     }
   };
 
