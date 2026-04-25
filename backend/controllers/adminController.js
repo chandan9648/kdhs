@@ -208,7 +208,14 @@ exports.getAttendanceReport = async (req, res) => {
       if (toDate) query.date.$lte = new Date(toDate);
     }
 
-    const attendance = await Attendance.find(query).populate('studentId').sort({ date: -1 });
+    const attendance = await Attendance.find(query)
+      .populate({
+        path: 'studentId',
+        populate: {
+          path: 'userId',
+        },
+      })
+      .sort({ date: -1 });
 
     // Group by student and calculate percentage
     const report = {};
@@ -260,7 +267,14 @@ exports.getMarksReport = async (req, res) => {
     if (examType) query.examType = examType;
     if (semester) query.semester = semester;
 
-    const marks = await Marks.find(query).populate('studentId').sort({ createdAt: -1 });
+    const marks = await Marks.find(query)
+      .populate({
+        path: 'studentId',
+        populate: {
+          path: 'userId',
+        },
+      })
+      .sort({ createdAt: -1 });
 
     res.status(200).json({ success: true, marks });
   } catch (error) {
