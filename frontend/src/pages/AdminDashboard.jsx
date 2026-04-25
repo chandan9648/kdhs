@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
+import Reports from '../components/Reports';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('students');
@@ -410,12 +411,7 @@ const AdminDashboard = () => {
 
             {/* Reports Tab */}
             {activeTab === 'reports' && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold mb-4">📊 Reports Coming Soon</h2>
-                <p className="text-gray-600">
-                  Attendance and marks reports will be displayed here.
-                </p>
-              </div>
+              <Reports />
             )}
           </div>
         </div>
