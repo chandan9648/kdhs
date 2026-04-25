@@ -18,30 +18,44 @@ exports.markAttendance = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Status must be present or absent' });
     }
 
+    // Parse the date properly (handle YYYY-MM-DD format)
+    const attendanceDate = new Date(date);
+    if (isNaN(attendanceDate.getTime())) {
+      return res.status(400).json({ success: false, message: 'Invalid date format' });
+    }
+
+    // Set time to 00:00:00 for consistent comparison
+    attendanceDate.setUTCHours(0, 0, 0, 0);
+
     // Check if attendance already exists for this date
     let attendance = await Attendance.findOne({
       studentId,
-      date: new Date(date).toDateString(),
+      date: {
+        $gte: attendanceDate,
+        $lt: new Date(attendanceDate.getTime() + 24 * 60 * 60 * 1000), // Next day
+      },
     });
 
     if (attendance) {
       // Update existing attendance
       attendance.status = status;
-      attendance.remarks = remarks;
+      attendance.remarks = remarks || '';
       await attendance.save();
-    } else {
-      // Create new attendance record
-      attendance = await Attendance.create({
-        studentId,
-        date: new Date(date),
-        status,
-        markedBy: req.user.id,
-        remarks,
-      });
+      return res.status(200).json({ success: true, attendance, message: 'Attendance updated' });
     }
 
-    res.status(201).json({ success: true, attendance });
+    // Create new attendance record
+    attendance = await Attendance.create({
+      studentId,
+      date: attendanceDate,
+      status,
+      markedBy: req.user.id,
+      remarks: remarks || '',
+    });
+
+    res.status(201).json({ success: true, attendance, message: 'Attendance marked successfully' });
   } catch (error) {
+    console.error('Attendance error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -58,21 +72,30 @@ exports.addMarks = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide all required fields' });
     }
 
-    if (marks < 0 || marks > 100) {
-      return res.status(400).json({ success: false, message: 'Marks must be between 0 and 100' });
+    // Validate marks is a number
+    const marksNum = parseInt(marks);
+    if (isNaN(marksNum) || marksNum < 0 || marksNum > 100) {
+      return res.status(400).json({ success: false, message: 'Marks must be a number between 0 and 100' });
+    }
+
+    // Validate exam type
+    const validExamTypes = ['unit1', 'unit2', 'midterm', 'final'];
+    if (!validExamTypes.includes(examType)) {
+      return res.status(400).json({ success: false, message: 'Invalid exam type' });
     }
 
     const marksRecord = await Marks.create({
       studentId,
-      subject,
-      marks,
+      subject: subject.trim(),
+      marks: marksNum,
       examType,
       semester: semester || '1',
       addedBy: req.user.id,
     });
 
-    res.status(201).json({ success: true, marks: marksRecord });
+    res.status(201).json({ success: true, marks: marksRecord, message: 'Marks added successfully' });
   } catch (error) {
+    console.error('Marks error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

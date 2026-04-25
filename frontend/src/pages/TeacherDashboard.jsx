@@ -46,51 +46,123 @@ const TeacherDashboard = () => {
   const submitAttendance = async () => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
+      
+      if (!attendanceDate) {
+        alert('❌ Please select a date');
+        return;
+      }
+
+      if (students.length === 0) {
+        alert('❌ No students found for this class');
+        return;
+      }
+
+      let successCount = 0;
+      let errorCount = 0;
+
       // Submit attendance for each student
       for (let student of students) {
-        const status = document.getElementById(`status-${student._id}`)?.value || 'absent';
-        await axios.post(
-          '/api/teacher/attendance',
-          {
-            studentId: student._id,
-            date: attendanceDate,
-            status,
-          },
-          config
-        );
+        const status = document.getElementById(`status-${student._id}`)?.value;
+        
+        if (!status) {
+          errorCount++;
+          continue;
+        }
+
+        try {
+          await axios.post(
+            '/api/teacher/attendance',
+            {
+              studentId: student._id,
+              date: attendanceDate, // YYYY-MM-DD format
+              status,
+              remarks: '',
+            },
+            config
+          );
+          successCount++;
+        } catch (err) {
+          console.error(`Error marking attendance for ${student.userId.name}:`, err.response?.data?.message);
+          errorCount++;
+        }
       }
-      alert('✅ Attendance marked successfully');
+
+      if (successCount > 0) {
+        alert(`✅ Attendance marked successfully for ${successCount} student(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
+      } else {
+        alert(`❌ Failed to mark attendance for all students`);
+      }
     } catch (error) {
       console.error('Error submitting attendance:', error);
-      alert('❌ Error marking attendance');
+      alert(`❌ Error: ${error.response?.data?.message || 'Failed to mark attendance'}`);
     }
   };
 
   const submitMarks = async () => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const subject = document.getElementById('subject')?.value;
+      const subject = document.getElementById('subject')?.value?.trim();
       const examType = document.getElementById('examType')?.value;
 
+      if (!subject) {
+        alert('❌ Please enter a subject name');
+        return;
+      }
+
+      if (!examType) {
+        alert('❌ Please select an exam type');
+        return;
+      }
+
+      if (students.length === 0) {
+        alert('❌ No students found for this class');
+        return;
+      }
+
+      let successCount = 0;
+      let errorCount = 0;
+
       for (let student of students) {
-        const marks = document.getElementById(`marks-${student._id}`)?.value;
-        if (marks !== undefined && marks !== '') {
+        const marksValue = document.getElementById(`marks-${student._id}`)?.value;
+        
+        if (marksValue === undefined || marksValue === '') {
+          continue; // Skip empty entries
+        }
+
+        const marks = parseInt(marksValue);
+        
+        if (isNaN(marks) || marks < 0 || marks > 100) {
+          console.warn(`Invalid marks for ${student.userId.name}: ${marksValue}`);
+          errorCount++;
+          continue;
+        }
+
+        try {
           await axios.post(
             '/api/teacher/marks',
             {
               studentId: student._id,
               subject,
-              marks: parseInt(marks),
+              marks,
               examType,
             },
             config
           );
+          successCount++;
+        } catch (err) {
+          console.error(`Error uploading marks for ${student.userId.name}:`, err.response?.data?.message);
+          errorCount++;
         }
       }
-      alert('✅ Marks uploaded successfully');
+
+      if (successCount > 0) {
+        alert(`✅ Marks uploaded successfully for ${successCount} student(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
+      } else {
+        alert(`❌ No marks were uploaded`);
+      }
     } catch (error) {
       console.error('Error uploading marks:', error);
-      alert('❌ Error uploading marks');
+      alert(`❌ Error: ${error.response?.data?.message || 'Failed to upload marks'}`);
     }
   };
 
