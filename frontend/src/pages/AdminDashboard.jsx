@@ -143,7 +143,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar role="admin" isOpen={sidebarOpen} />
+      <Sidebar role="admin" isOpen={sidebarOpen} onTabChange={setActiveTab} toggleSidebar={toggleSidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar role="admin" toggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />

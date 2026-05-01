@@ -50,7 +50,7 @@ const StudentDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar role="student" isOpen={sidebarOpen} />
+      <Sidebar role="student" isOpen={sidebarOpen} onTabChange={handleTabChange} toggleSidebar={toggleSidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar role="student" toggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />

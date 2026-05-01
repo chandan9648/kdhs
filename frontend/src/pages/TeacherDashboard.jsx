@@ -168,7 +168,7 @@ const TeacherDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar role="teacher" isOpen={sidebarOpen} />
+      <Sidebar role="teacher" isOpen={sidebarOpen} onTabChange={setActiveTab} toggleSidebar={toggleSidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar role="teacher" toggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
