@@ -5,6 +5,51 @@ import Sidebar from '../components/Sidebar';
 import Reports from '../components/Reports';
 import ProfileSettings from '../components/ProfileSettings';
 
+const emptyForm = {
+  name: '', email: '', password: '', class: '10A', rollNo: '',
+  subject: '', qualifications: '', studentId: '', relation: 'Guardian',
+  phoneNo: '', experience: '',
+};
+
+/* ─── Reusable Edit Modal ─── */
+const EditModal = ({ title, onClose, onSave, children }) => (
+  <div style={{
+    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+  }}>
+    <div style={{
+      background: '#fff', borderRadius: 14, padding: 32, width: '100%',
+      maxWidth: 560, boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>{title}</h2>
+        <button onClick={onClose} style={{
+          background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#94a3b8',
+        }}>✕</button>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        {children}
+      </div>
+      <div style={{ marginTop: 20, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+        <button onClick={onClose} style={{
+          padding: '8px 20px', borderRadius: 8, border: '1px solid #cbd5e1',
+          background: '#f8fafc', cursor: 'pointer', fontWeight: 600, color: '#64748b',
+        }}>Cancel</button>
+        <button onClick={onSave} style={{
+          padding: '8px 24px', borderRadius: 8, border: 'none',
+          background: 'linear-gradient(135deg,#3b82f6,#6366f1)', color: '#fff',
+          cursor: 'pointer', fontWeight: 700, fontSize: 15,
+        }}>💾 Save Changes</button>
+      </div>
+    </div>
+  </div>
+);
+
+const inputStyle = {
+  padding: '9px 12px', border: '1px solid #e2e8f0', borderRadius: 8,
+  fontSize: 14, outline: 'none', width: '100%', boxSizing: 'border-box',
+};
+
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('students');
   const [students, setStudents] = useState([]);
@@ -14,189 +59,135 @@ const AdminDashboard = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Edit state
+  const [editTarget, setEditTarget] = useState(null); // { type, record }
+  const [editForm, setEditForm] = useState({});
+
   const token = localStorage.getItem('token');
+  const config = { headers: { Authorization: `Bearer ${token}` } };
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    class: '10A',
-    rollNo: '',
-    subject: '',
-    qualifications: '',
-    studentId: '',
-    relation: 'Guardian',
-    phoneNo: '',
-  });
+  const [formData, setFormData] = useState(emptyForm);
 
   useEffect(() => {
-    if (activeTab === 'students') {
-      fetchStudents();
-    } else if (activeTab === 'teachers') {
-      fetchTeachers();
-    } else if (activeTab === 'parents') {
-      fetchParents();
-      fetchStudents(); // need student list for the add-parent form
-    }
+    if (activeTab === 'students') fetchStudents();
+    else if (activeTab === 'teachers') fetchTeachers();
+    else if (activeTab === 'parents') { fetchParents(); fetchStudents(); }
   }, [activeTab]);
 
   const fetchStudents = async () => {
-    try {
-      setLoading(true);
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await axios.get('/api/admin/students', config);
-      setStudents(res.data.students);
-    } catch (error) {
-      console.error('Error fetching students:', error);
-    } finally {
-      setLoading(false);
-    }
+    try { setLoading(true); const r = await axios.get('/api/admin/students', config); setStudents(r.data.students); }
+    catch (e) { console.error(e); } finally { setLoading(false); }
   };
-
   const fetchTeachers = async () => {
-    try {
-      setLoading(true);
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await axios.get('/api/admin/teachers', config);
-      setTeachers(res.data.teachers);
-    } catch (error) {
-      console.error('Error fetching teachers:', error);
-    } finally {
-      setLoading(false);
-    }
+    try { setLoading(true); const r = await axios.get('/api/admin/teachers', config); setTeachers(r.data.teachers); }
+    catch (e) { console.error(e); } finally { setLoading(false); }
   };
-
   const fetchParents = async () => {
-    try {
-      setLoading(true);
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await axios.get('/api/admin/parents', config);
-      setParents(res.data.parents);
-    } catch (error) {
-      console.error('Error fetching parents:', error);
-    } finally {
-      setLoading(false);
-    }
+    try { setLoading(true); const r = await axios.get('/api/admin/parents', config); setParents(r.data.parents); }
+    catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
+  /* ── Add handlers ── */
   const handleAddStudent = async (e) => {
     e.preventDefault();
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      // Prepare data for student (exclude teacher fields)
-      const studentData = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        class: formData.class,
-        rollNo: parseInt(formData.rollNo) || 0, // Convert to number
-      };
-
-      const response = await axios.post('/api/admin/student', studentData, config);
-      alert('✅ Student added successfully');
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-        class: '10A',
-        rollNo: '',
-        subject: '',
-        qualifications: '',
-      });
-      setShowAddForm(false);
-      fetchStudents();
-    } catch (error) {
-      console.error('Error adding student:', error.response?.data || error.message);
-      alert(`❌ Error: ${error.response?.data?.message || 'Failed to add student'}`);
-    }
+      await axios.post('/api/admin/student', {
+        name: formData.name, email: formData.email, password: formData.password,
+        class: formData.class, rollNo: parseInt(formData.rollNo) || 0,
+      }, config);
+      alert('✅ Student added'); setFormData(emptyForm); setShowAddForm(false); fetchStudents();
+    } catch (err) { alert(`❌ ${err.response?.data?.message || 'Failed'}`); }
   };
-
   const handleAddTeacher = async (e) => {
     e.preventDefault();
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      // Prepare data for teacher (exclude student fields)
-      const teacherData = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        subject: formData.subject,
-        qualifications: formData.qualifications,
-      };
-
-      const response = await axios.post('/api/admin/teacher', teacherData, config);
-      alert('✅ Teacher added successfully');
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-        class: '10A',
-        rollNo: '',
-        subject: '',
-        qualifications: '',
-        studentId: '',
-        relation: 'Guardian',
-        phoneNo: '',
-      });
-      setShowAddForm(false);
-      fetchTeachers();
-    } catch (error) {
-      console.error('Error adding teacher:', error.response?.data || error.message);
-      alert(`❌ Error: ${error.response?.data?.message || 'Failed to add teacher'}`);
-    }
+      await axios.post('/api/admin/teacher', {
+        name: formData.name, email: formData.email, password: formData.password,
+        subject: formData.subject, qualifications: formData.qualifications,
+      }, config);
+      alert('✅ Teacher added'); setFormData(emptyForm); setShowAddForm(false); fetchTeachers();
+    } catch (err) { alert(`❌ ${err.response?.data?.message || 'Failed'}`); }
   };
-
   const handleAddParent = async (e) => {
     e.preventDefault();
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const parentData = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        studentId: formData.studentId,
-        relation: formData.relation,
-        phoneNo: formData.phoneNo,
-      };
-      await axios.post('/api/admin/parent', parentData, config);
-      alert('✅ Parent added successfully');
-      setFormData({ name: '', email: '', password: '', class: '10A', rollNo: '', subject: '', qualifications: '', studentId: '', relation: 'Guardian', phoneNo: '' });
-      setShowAddForm(false);
-      fetchParents();
-    } catch (error) {
-      console.error('Error adding parent:', error.response?.data || error.message);
-      alert(`❌ Error: ${error.response?.data?.message || 'Failed to add parent'}`);
+      await axios.post('/api/admin/parent', {
+        name: formData.name, email: formData.email, password: formData.password,
+        studentId: formData.studentId, relation: formData.relation, phoneNo: formData.phoneNo,
+      }, config);
+      alert('✅ Parent added'); setFormData(emptyForm); setShowAddForm(false); fetchParents();
+    } catch (err) { alert(`❌ ${err.response?.data?.message || 'Failed'}`); }
+  };
+
+  /* ── Delete handlers ── */
+  const handleDelete = async (type, id) => {
+    if (!window.confirm(`Delete this ${type}?`)) return;
+    try {
+      await axios.delete(`/api/admin/${type}/${id}`, config);
+      alert(`✅ ${type.charAt(0).toUpperCase() + type.slice(1)} deleted`);
+      if (type === 'student') fetchStudents();
+      else if (type === 'teacher') fetchTeachers();
+      else fetchParents();
+    } catch { alert(`❌ Error deleting ${type}`); }
+  };
+
+  /* ── Open Edit Modal ── */
+  const openEdit = (type, record) => {
+    setEditTarget({ type, id: record._id });
+    if (type === 'student') {
+      setEditForm({
+        name: record.userId?.name || '',
+        email: record.userId?.email || '',
+        class: record.class || '10A',
+        rollNo: record.rollNo || '',
+        phoneNo: record.phoneNo || '',
+        parentName: record.parentName || '',
+        parentPhone: record.parentPhone || '',
+        address: record.address || '',
+      });
+    } else if (type === 'teacher') {
+      setEditForm({
+        name: record.userId?.name || '',
+        email: record.userId?.email || '',
+        subject: record.subject || '',
+        qualifications: record.qualifications || '',
+        phoneNo: record.phoneNo || '',
+        experience: record.experience || '',
+      });
+    } else if (type === 'parent') {
+      setEditForm({
+        name: record.userId?.name || '',
+        email: record.userId?.email || '',
+        relation: record.relation || 'Guardian',
+        phoneNo: record.phoneNo || '',
+        studentId: record.studentId?._id || '',
+      });
     }
   };
 
-  const handleDeleteStudent = async (id) => {
-    if (window.confirm('Are you sure?')) {
-      try {
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-        await axios.delete(`/api/admin/student/${id}`, config);
-        alert('✅ Student deleted');
-        fetchStudents();
-      } catch (error) {
-        alert('❌ Error deleting student');
-      }
-    }
+  /* ── Save Edit ── */
+  const handleSaveEdit = async () => {
+    const { type, id } = editTarget;
+    try {
+      const payload = { ...editForm };
+      if (type === 'student' && payload.rollNo) payload.rollNo = parseInt(payload.rollNo);
+      await axios.put(`/api/admin/${type}/${id}`, payload, config);
+      alert(`✅ ${type.charAt(0).toUpperCase() + type.slice(1)} updated`);
+      setEditTarget(null);
+      if (type === 'student') fetchStudents();
+      else if (type === 'teacher') fetchTeachers();
+      else fetchParents();
+    } catch (err) { alert(`❌ ${err.response?.data?.message || 'Update failed'}`); }
   };
 
-  // Helper to reset shared form
-  const resetForm = () => setFormData({ name: '', email: '', password: '', class: '10A', rollNo: '', subject: '', qualifications: '', studentId: '', relation: 'Guardian', phoneNo: '' });
+  const ef = (key) => ({ value: editForm[key] ?? '', onChange: (e) => setEditForm({ ...editForm, [key]: e.target.value }), style: inputStyle });
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar role="admin" isOpen={sidebarOpen} onTabChange={setActiveTab} toggleSidebar={toggleSidebar} />
+      <Sidebar role="admin" isOpen={sidebarOpen} onTabChange={setActiveTab} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar role="admin" toggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
+        <Navbar role="admin" toggleSidebar={() => setSidebarOpen(!sidebarOpen)} isSidebarOpen={sidebarOpen} />
 
         <div className="flex-1 overflow-auto p-6">
           <div className="max-w-7xl mx-auto">
@@ -205,154 +196,57 @@ const AdminDashboard = () => {
             {/* Tabs */}
             <div className="bg-white rounded-lg shadow mb-6">
               <div className="flex border-b">
-                <button
-                  onClick={() => setActiveTab('students')}
-                  className={`flex-1 py-3 font-semibold ${
-                    activeTab === 'students'
-                      ? 'border-b-2 border-blue-500 text-blue-500'
-                      : 'text-gray-600'
-                  }`}
-                >
-                  👨‍🎓 Students
-                </button>
-                <button
-                  onClick={() => setActiveTab('teachers')}
-                  className={`flex-1 py-3 font-semibold ${
-                    activeTab === 'teachers'
-                      ? 'border-b-2 border-blue-500 text-blue-500'
-                      : 'text-gray-600'
-                  }`}
-                >
-                  👩‍🏫 Teachers
-                </button>
-                <button
-                  onClick={() => setActiveTab('parents')}
-                  className={`flex-1 py-3 font-semibold ${
-                    activeTab === 'parents'
-                      ? 'border-b-2 border-blue-500 text-blue-500'
-                      : 'text-gray-600'
-                  }`}
-                >
-                  👨‍👩‍👧 Parents
-                </button>
-                <button
-                  onClick={() => setActiveTab('reports')}
-                  className={`flex-1 py-3 font-semibold ${
-                    activeTab === 'reports'
-                      ? 'border-b-2 border-blue-500 text-blue-500'
-                      : 'text-gray-600'
-                  }`}
-                >
-                  📊 Reports
-                </button>
+                {['students','teachers','parents','reports'].map(tab => (
+                  <button key={tab} onClick={() => { setActiveTab(tab); setShowAddForm(false); }}
+                    className={`flex-1 py-3 font-semibold ${activeTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}`}>
+                    {tab === 'students' ? '👨‍🎓 Students' : tab === 'teachers' ? '👩‍🏫 Teachers' : tab === 'parents' ? '👨‍👩‍👧 Parents' : '📊 Reports'}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Students Tab */}
+            {/* ── Students Tab ── */}
             {activeTab === 'students' && (
               <div>
-                <button
-                  onClick={() => setShowAddForm(!showAddForm)}
-                  className="mb-6 bg-green-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-600"
-                >
+                <button onClick={() => setShowAddForm(!showAddForm)}
+                  className="mb-6 bg-green-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-600">
                   {showAddForm ? '✖️ Cancel' : '➕ Add Student'}
                 </button>
-
                 {showAddForm && (
                   <div className="bg-white rounded-lg shadow p-6 mb-6">
                     <form onSubmit={handleAddStudent}>
                       <div className="grid grid-cols-2 gap-4">
-                        <input
-                          type="text"
-                          placeholder="Name"
-                          value={formData.name}
-                          onChange={(e) =>
-                            setFormData({ ...formData, name: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        />
-                        <input
-                          type="email"
-                          placeholder="Email"
-                          value={formData.email}
-                          onChange={(e) =>
-                            setFormData({ ...formData, email: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        />
-                        <input
-                          type="password"
-                          placeholder="Password"
-                          value={formData.password}
-                          onChange={(e) =>
-                            setFormData({ ...formData, password: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        />
-                        <select
-                          value={formData.class}
-                          onChange={(e) =>
-                            setFormData({ ...formData, class: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg"
-                        >
-                          <option value="10A">10A</option>
-                          <option value="10B">10B</option>
-                          <option value="12A">12A</option>
-                          <option value="12B">12B</option>
+                        <input style={inputStyle} placeholder="Name" value={formData.name} onChange={e => setFormData({...formData,name:e.target.value})} required />
+                        <input style={inputStyle} type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({...formData,email:e.target.value})} required />
+                        <input style={inputStyle} type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({...formData,password:e.target.value})} required />
+                        <select style={inputStyle} value={formData.class} onChange={e => setFormData({...formData,class:e.target.value})}>
+                          {['10A','10B','12A','12B'].map(c => <option key={c}>{c}</option>)}
                         </select>
-                        <input
-                          type="number"
-                          placeholder="Roll No"
-                          value={formData.rollNo}
-                          onChange={(e) =>
-                            setFormData({ ...formData, rollNo: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        />
+                        <input style={inputStyle} type="number" placeholder="Roll No" value={formData.rollNo} onChange={e => setFormData({...formData,rollNo:e.target.value})} required />
                       </div>
-                      <button
-                        type="submit"
-                        className="mt-4 bg-blue-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-600"
-                      >
-                        ✅ Add Student
-                      </button>
+                      <button type="submit" className="mt-4 bg-blue-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-600">✅ Add Student</button>
                     </form>
                   </div>
                 )}
-
-                {loading ? (
-                  <div className="text-center text-gray-500">Loading...</div>
-                ) : (
+                {loading ? <div className="text-center text-gray-500">Loading...</div> : (
                   <div className="bg-white rounded-lg shadow overflow-hidden">
                     <table className="w-full">
                       <thead className="bg-gray-200">
                         <tr>
-                          <th className="px-4 py-2 text-left">Name</th>
-                          <th className="px-4 py-2 text-left">Email</th>
-                          <th className="px-4 py-2 text-left">Class</th>
-                          <th className="px-4 py-2 text-left">Roll No</th>
-                          <th className="px-4 py-2 text-left">Action</th>
+                          {['Name','Email','Class','Roll No','Phone','Actions'].map(h => <th key={h} className="px-4 py-2 text-left">{h}</th>)}
                         </tr>
                       </thead>
                       <tbody>
-                        {students.map((student) => (
-                          <tr key={student._id} className="border-t hover:bg-gray-50">
-                            <td className="px-4 py-2">{student.userId.name}</td>
-                            <td className="px-4 py-2">{student.userId.email}</td>
-                            <td className="px-4 py-2">{student.class}</td>
-                            <td className="px-4 py-2">{student.rollNo}</td>
-                            <td className="px-4 py-2">
-                              <button
-                                onClick={() => handleDeleteStudent(student._id)}
-                                className="text-red-500 hover:text-red-700 font-semibold"
-                              >
-                                🗑️ Delete
-                              </button>
+                        {students.map(s => (
+                          <tr key={s._id} className="border-t hover:bg-gray-50">
+                            <td className="px-4 py-2">{s.userId?.name}</td>
+                            <td className="px-4 py-2">{s.userId?.email}</td>
+                            <td className="px-4 py-2">{s.class}</td>
+                            <td className="px-4 py-2">{s.rollNo}</td>
+                            <td className="px-4 py-2">{s.phoneNo || '—'}</td>
+                            <td className="px-4 py-2 flex gap-3">
+                              <button onClick={() => openEdit('student', s)} className="text-blue-500 hover:text-blue-700 font-semibold">✏️ Edit</button>
+                              <button onClick={() => handleDelete('student', s._id)} className="text-red-500 hover:text-red-700 font-semibold">🗑️ Delete</button>
                             </td>
                           </tr>
                         ))}
@@ -363,103 +257,47 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {/* Teachers Tab */}
+            {/* ── Teachers Tab ── */}
             {activeTab === 'teachers' && (
               <div>
-                <button
-                  onClick={() => setShowAddForm(!showAddForm)}
-                  className="mb-6 bg-green-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-600"
-                >
+                <button onClick={() => setShowAddForm(!showAddForm)}
+                  className="mb-6 bg-green-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-600">
                   {showAddForm ? '✖️ Cancel' : '➕ Add Teacher'}
                 </button>
-
                 {showAddForm && (
                   <div className="bg-white rounded-lg shadow p-6 mb-6">
                     <form onSubmit={handleAddTeacher}>
                       <div className="grid grid-cols-2 gap-4">
-                        <input
-                          type="text"
-                          placeholder="Name"
-                          value={formData.name}
-                          onChange={(e) =>
-                            setFormData({ ...formData, name: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        />
-                        <input
-                          type="email"
-                          placeholder="Email"
-                          value={formData.email}
-                          onChange={(e) =>
-                            setFormData({ ...formData, email: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        />
-                        <input
-                          type="password"
-                          placeholder="Password"
-                          value={formData.password}
-                          onChange={(e) =>
-                            setFormData({ ...formData, password: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        />
-                        <input
-                          type="text"
-                          placeholder="Subject"
-                          value={formData.subject}
-                          onChange={(e) =>
-                            setFormData({ ...formData, subject: e.target.value })
-                          }
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        />
-                        <input
-                          type="text"
-                          placeholder="Qualifications"
-                          value={formData.qualifications}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              qualifications: e.target.value,
-                            })
-                          }
-                          className="px-4 py-2 border rounded-lg"
-                        />
+                        <input style={inputStyle} placeholder="Name" value={formData.name} onChange={e => setFormData({...formData,name:e.target.value})} required />
+                        <input style={inputStyle} type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({...formData,email:e.target.value})} required />
+                        <input style={inputStyle} type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({...formData,password:e.target.value})} required />
+                        <input style={inputStyle} placeholder="Subject" value={formData.subject} onChange={e => setFormData({...formData,subject:e.target.value})} required />
+                        <input style={inputStyle} placeholder="Qualifications" value={formData.qualifications} onChange={e => setFormData({...formData,qualifications:e.target.value})} />
                       </div>
-                      <button
-                        type="submit"
-                        className="mt-4 bg-blue-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-600"
-                      >
-                        ✅ Add Teacher
-                      </button>
+                      <button type="submit" className="mt-4 bg-blue-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-600">✅ Add Teacher</button>
                     </form>
                   </div>
                 )}
-
-                {loading ? (
-                  <div className="text-center text-gray-500">Loading...</div>
-                ) : (
+                {loading ? <div className="text-center text-gray-500">Loading...</div> : (
                   <div className="bg-white rounded-lg shadow overflow-hidden">
                     <table className="w-full">
                       <thead className="bg-gray-200">
                         <tr>
-                          <th className="px-4 py-2 text-left">Name</th>
-                          <th className="px-4 py-2 text-left">Email</th>
-                          <th className="px-4 py-2 text-left">Subject</th>
-                          <th className="px-4 py-2 text-left">Qualifications</th>
+                          {['Name','Email','Subject','Qualifications','Phone','Actions'].map(h => <th key={h} className="px-4 py-2 text-left">{h}</th>)}
                         </tr>
                       </thead>
                       <tbody>
-                        {teachers.map((teacher) => (
-                          <tr key={teacher._id} className="border-t hover:bg-gray-50">
-                            <td className="px-4 py-2">{teacher.userId.name}</td>
-                            <td className="px-4 py-2">{teacher.userId.email}</td>
-                            <td className="px-4 py-2">{teacher.subject}</td>
-                            <td className="px-4 py-2">{teacher.qualifications}</td>
+                        {teachers.map(t => (
+                          <tr key={t._id} className="border-t hover:bg-gray-50">
+                            <td className="px-4 py-2">{t.userId?.name}</td>
+                            <td className="px-4 py-2">{t.userId?.email}</td>
+                            <td className="px-4 py-2">{t.subject}</td>
+                            <td className="px-4 py-2">{t.qualifications || '—'}</td>
+                            <td className="px-4 py-2">{t.phoneNo || '—'}</td>
+                            <td className="px-4 py-2 flex gap-3">
+                              <button onClick={() => openEdit('teacher', t)} className="text-blue-500 hover:text-blue-700 font-semibold">✏️ Edit</button>
+                              <button onClick={() => handleDelete('teacher', t._id)} className="text-red-500 hover:text-red-700 font-semibold">🗑️ Delete</button>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -469,110 +307,54 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {/* Parents Tab */}
+            {/* ── Parents Tab ── */}
             {activeTab === 'parents' && (
               <div>
-                <button
-                  onClick={() => setShowAddForm(!showAddForm)}
-                  className="mb-6 bg-purple-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-purple-600"
-                >
+                <button onClick={() => setShowAddForm(!showAddForm)}
+                  className="mb-6 bg-purple-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-purple-600">
                   {showAddForm ? '✖️ Cancel' : '➕ Add Parent'}
                 </button>
-
                 {showAddForm && (
                   <div className="bg-white rounded-lg shadow p-6 mb-6">
                     <form onSubmit={handleAddParent}>
                       <div className="grid grid-cols-2 gap-4">
-                        <input
-                          type="text"
-                          placeholder="Parent Name"
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        />
-                        <input
-                          type="email"
-                          placeholder="Parent Email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        />
-                        <input
-                          type="password"
-                          placeholder="Password"
-                          value={formData.password}
-                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        />
-                        <input
-                          type="text"
-                          placeholder="Phone No"
-                          value={formData.phoneNo}
-                          onChange={(e) => setFormData({ ...formData, phoneNo: e.target.value })}
-                          className="px-4 py-2 border rounded-lg"
-                        />
-                        <select
-                          value={formData.relation}
-                          onChange={(e) => setFormData({ ...formData, relation: e.target.value })}
-                          className="px-4 py-2 border rounded-lg"
-                        >
-                          <option value="Father">Father</option>
-                          <option value="Mother">Mother</option>
-                          <option value="Guardian">Guardian</option>
+                        <input style={inputStyle} placeholder="Parent Name" value={formData.name} onChange={e => setFormData({...formData,name:e.target.value})} required />
+                        <input style={inputStyle} type="email" placeholder="Parent Email" value={formData.email} onChange={e => setFormData({...formData,email:e.target.value})} required />
+                        <input style={inputStyle} type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({...formData,password:e.target.value})} required />
+                        <input style={inputStyle} placeholder="Phone No" value={formData.phoneNo} onChange={e => setFormData({...formData,phoneNo:e.target.value})} />
+                        <select style={inputStyle} value={formData.relation} onChange={e => setFormData({...formData,relation:e.target.value})}>
+                          {['Father','Mother','Guardian'].map(r => <option key={r}>{r}</option>)}
                         </select>
-                        <select
-                          value={formData.studentId}
-                          onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
-                          className="px-4 py-2 border rounded-lg"
-                          required
-                        >
-                          <option value="">-- Select Child (Student) --</option>
-                          {students.map((s) => (
-                            <option key={s._id} value={s._id}>
-                              {s.userId?.name} – {s.class} (Roll {s.rollNo})
-                            </option>
-                          ))}
+                        <select style={inputStyle} value={formData.studentId} onChange={e => setFormData({...formData,studentId:e.target.value})} required>
+                          <option value="">-- Select Child --</option>
+                          {students.map(s => <option key={s._id} value={s._id}>{s.userId?.name} – {s.class} (Roll {s.rollNo})</option>)}
                         </select>
                       </div>
-                      <button
-                        type="submit"
-                        className="mt-4 bg-purple-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-purple-600"
-                      >
-                        ✅ Add Parent
-                      </button>
+                      <button type="submit" className="mt-4 bg-purple-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-purple-600">✅ Add Parent</button>
                     </form>
                   </div>
                 )}
-
-                {loading ? (
-                  <div className="text-center text-gray-500">Loading...</div>
-                ) : (
+                {loading ? <div className="text-center text-gray-500">Loading...</div> : (
                   <div className="bg-white rounded-lg shadow overflow-hidden">
                     <table className="w-full">
                       <thead className="bg-gray-200">
                         <tr>
-                          <th className="px-4 py-2 text-left">Parent Name</th>
-                          <th className="px-4 py-2 text-left">Email</th>
-                          <th className="px-4 py-2 text-left">Relation</th>
-                          <th className="px-4 py-2 text-left">Child</th>
-                          <th className="px-4 py-2 text-left">Class</th>
+                          {['Parent Name','Email','Relation','Phone','Child','Class','Actions'].map(h => <th key={h} className="px-4 py-2 text-left">{h}</th>)}
                         </tr>
                       </thead>
                       <tbody>
-                        {parents.map((parent) => (
-                          <tr key={parent._id} className="border-t hover:bg-gray-50">
-                            <td className="px-4 py-2">{parent.userId?.name}</td>
-                            <td className="px-4 py-2">{parent.userId?.email}</td>
-                            <td className="px-4 py-2">
-                              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
-                                {parent.relation}
-                              </span>
+                        {parents.map(p => (
+                          <tr key={p._id} className="border-t hover:bg-gray-50">
+                            <td className="px-4 py-2">{p.userId?.name}</td>
+                            <td className="px-4 py-2">{p.userId?.email}</td>
+                            <td className="px-4 py-2"><span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">{p.relation}</span></td>
+                            <td className="px-4 py-2">{p.phoneNo || '—'}</td>
+                            <td className="px-4 py-2">{p.studentId?.userId?.name || '—'}</td>
+                            <td className="px-4 py-2">{p.studentId?.class || '—'}</td>
+                            <td className="px-4 py-2 flex gap-3">
+                              <button onClick={() => openEdit('parent', p)} className="text-blue-500 hover:text-blue-700 font-semibold">✏️ Edit</button>
+                              <button onClick={() => handleDelete('parent', p._id)} className="text-red-500 hover:text-red-700 font-semibold">🗑️ Delete</button>
                             </td>
-                            <td className="px-4 py-2">{parent.studentId?.userId?.name || '—'}</td>
-                            <td className="px-4 py-2">{parent.studentId?.class || '—'}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -582,16 +364,58 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            {/* Reports Tab */}
-            {activeTab === 'reports' && (
-              <Reports />
-            )}
-
-            {/* More / Profile Settings Tab */}
+            {activeTab === 'reports' && <Reports />}
             {activeTab === 'more' && <ProfileSettings />}
           </div>
         </div>
       </div>
+
+      {/* ── Edit Modal: Student ── */}
+      {editTarget?.type === 'student' && (
+        <EditModal title="✏️ Edit Student" onClose={() => setEditTarget(null)} onSave={handleSaveEdit}>
+          <input {...ef('name')} placeholder="Full Name" />
+          <input {...ef('email')} type="email" placeholder="Email" />
+          <select {...ef('class')}>
+            {['10A','10B','12A','12B'].map(c => <option key={c}>{c}</option>)}
+          </select>
+          <input {...ef('rollNo')} type="number" placeholder="Roll No" />
+          <input {...ef('phoneNo')} placeholder="Phone No" />
+          <input {...ef('parentName')} placeholder="Parent Name" />
+          <input {...ef('parentPhone')} placeholder="Parent Phone" />
+          <input {...ef('address')} placeholder="Address" style={{ ...inputStyle, gridColumn: 'span 2' }} />
+        </EditModal>
+      )}
+
+      {/* ── Edit Modal: Teacher ── */}
+      {editTarget?.type === 'teacher' && (
+        <EditModal title="✏️ Edit Teacher" onClose={() => setEditTarget(null)} onSave={handleSaveEdit}>
+          <input {...ef('name')} placeholder="Full Name" />
+          <input {...ef('email')} type="email" placeholder="Email" />
+          <input {...ef('subject')} placeholder="Subject" />
+          <input {...ef('qualifications')} placeholder="Qualifications" />
+          <input {...ef('phoneNo')} placeholder="Phone No" />
+          <input {...ef('experience')} type="number" placeholder="Experience (years)" />
+        </EditModal>
+      )}
+
+      {/* ── Edit Modal: Parent ── */}
+      {editTarget?.type === 'parent' && (
+        <EditModal title="✏️ Edit Parent" onClose={() => setEditTarget(null)} onSave={handleSaveEdit}>
+          <input {...ef('name')} placeholder="Full Name" />
+          <input {...ef('email')} type="email" placeholder="Email" />
+          <select {...ef('relation')}>
+            {['Father','Mother','Guardian'].map(r => <option key={r}>{r}</option>)}
+          </select>
+          <input {...ef('phoneNo')} placeholder="Phone No" />
+          <div style={{ gridColumn: 'span 2' }}>
+            <label style={{ display: 'block', marginBottom: 4, fontSize: 13, color: '#64748b', fontWeight: 600 }}>Linked Student</label>
+            <select value={editForm.studentId} onChange={e => setEditForm({...editForm, studentId: e.target.value})} style={inputStyle}>
+              <option value="">-- Select Child --</option>
+              {students.map(s => <option key={s._id} value={s._id}>{s.userId?.name} – {s.class} (Roll {s.rollNo})</option>)}
+            </select>
+          </div>
+        </EditModal>
+      )}
     </div>
   );
 };

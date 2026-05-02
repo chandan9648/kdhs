@@ -188,6 +188,112 @@ exports.deleteStudent = async (req, res) => {
   }
 };
 
+// @desc    Update teacher
+// @route   PUT /api/admin/teacher/:id
+// @access  Private/Admin
+exports.updateTeacher = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const userUpdates = {};
+    const teacherUpdates = {};
+
+    if (updates.name) userUpdates.name = updates.name;
+    if (updates.email) userUpdates.email = updates.email;
+    if (updates.subject) teacherUpdates.subject = updates.subject;
+    if (updates.qualifications !== undefined) teacherUpdates.qualifications = updates.qualifications;
+    if (updates.phoneNo !== undefined) teacherUpdates.phoneNo = updates.phoneNo;
+    if (updates.experience !== undefined) teacherUpdates.experience = updates.experience;
+    if (updates.assignedClasses !== undefined) teacherUpdates.assignedClasses = updates.assignedClasses;
+
+    if (Object.keys(userUpdates).length > 0) {
+      const teacher = await Teacher.findById(id);
+      await User.findByIdAndUpdate(teacher.userId, userUpdates);
+    }
+
+    const updatedTeacher = await Teacher.findByIdAndUpdate(id, teacherUpdates, { new: true }).populate('userId');
+
+    res.status(200).json({ success: true, teacher: updatedTeacher });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Delete teacher
+// @route   DELETE /api/admin/teacher/:id
+// @access  Private/Admin
+exports.deleteTeacher = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const teacher = await Teacher.findById(id);
+    if (!teacher) {
+      return res.status(404).json({ success: false, message: 'Teacher not found' });
+    }
+
+    await User.findByIdAndDelete(teacher.userId);
+    await Teacher.findByIdAndDelete(id);
+
+    res.status(200).json({ success: true, message: 'Teacher deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Update parent
+// @route   PUT /api/admin/parent/:id
+// @access  Private/Admin
+exports.updateParent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const userUpdates = {};
+    const parentUpdates = {};
+
+    if (updates.name) userUpdates.name = updates.name;
+    if (updates.email) userUpdates.email = updates.email;
+    if (updates.relation) parentUpdates.relation = updates.relation;
+    if (updates.phoneNo !== undefined) parentUpdates.phoneNo = updates.phoneNo;
+    if (updates.studentId) parentUpdates.studentId = updates.studentId;
+
+    if (Object.keys(userUpdates).length > 0) {
+      const parent = await Parent.findById(id);
+      await User.findByIdAndUpdate(parent.userId, userUpdates);
+    }
+
+    const updatedParent = await Parent.findByIdAndUpdate(id, parentUpdates, { new: true })
+      .populate('userId', 'name email')
+      .populate({ path: 'studentId', populate: { path: 'userId', select: 'name' } });
+
+    res.status(200).json({ success: true, parent: updatedParent });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Delete parent
+// @route   DELETE /api/admin/parent/:id
+// @access  Private/Admin
+exports.deleteParent = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const parent = await Parent.findById(id);
+    if (!parent) {
+      return res.status(404).json({ success: false, message: 'Parent not found' });
+    }
+
+    await User.findByIdAndDelete(parent.userId);
+    await Parent.findByIdAndDelete(id);
+
+    res.status(200).json({ success: true, message: 'Parent deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Get attendance report
 // @route   GET /api/admin/reports/attendance
 // @access  Private/Admin
