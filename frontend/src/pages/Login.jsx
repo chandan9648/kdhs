@@ -94,7 +94,8 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
               >
                 <option value="admin">Admin</option>
                 <option value="teacher">Teacher</option>
-                <option value="student">Student</option>
+                {/* <option value="student">Student</option> */}
+                <option value="parent">Parent</option>
               </select>
             </div>
           )}

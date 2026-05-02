@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { signup, login, getMe } = require('../controllers/authController');
+const { signup, login, getMe, updateProfile } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 
 // Public routes
@@ -8,5 +8,6 @@ router.post('/login', login);
 
 // Private routes
 router.get('/me', protect, getMe);
+router.put('/profile', protect, updateProfile);
 
 module.exports = router;

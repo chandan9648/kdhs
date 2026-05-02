@@ -3,11 +3,13 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Reports from '../components/Reports';
+import ProfileSettings from '../components/ProfileSettings';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('students');
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
+  const [parents, setParents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -26,6 +28,9 @@ const AdminDashboard = () => {
     rollNo: '',
     subject: '',
     qualifications: '',
+    studentId: '',
+    relation: 'Guardian',
+    phoneNo: '',
   });
 
   useEffect(() => {
@@ -33,6 +38,9 @@ const AdminDashboard = () => {
       fetchStudents();
     } else if (activeTab === 'teachers') {
       fetchTeachers();
+    } else if (activeTab === 'parents') {
+      fetchParents();
+      fetchStudents(); // need student list for the add-parent form
     }
   }, [activeTab]);
 
@@ -57,6 +65,19 @@ const AdminDashboard = () => {
       setTeachers(res.data.teachers);
     } catch (error) {
       console.error('Error fetching teachers:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchParents = async () => {
+    try {
+      setLoading(true);
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const res = await axios.get('/api/admin/parents', config);
+      setParents(res.data.parents);
+    } catch (error) {
+      console.error('Error fetching parents:', error);
     } finally {
       setLoading(false);
     }
@@ -119,12 +140,38 @@ const AdminDashboard = () => {
         rollNo: '',
         subject: '',
         qualifications: '',
+        studentId: '',
+        relation: 'Guardian',
+        phoneNo: '',
       });
       setShowAddForm(false);
       fetchTeachers();
     } catch (error) {
       console.error('Error adding teacher:', error.response?.data || error.message);
       alert(`❌ Error: ${error.response?.data?.message || 'Failed to add teacher'}`);
+    }
+  };
+
+  const handleAddParent = async (e) => {
+    e.preventDefault();
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const parentData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        studentId: formData.studentId,
+        relation: formData.relation,
+        phoneNo: formData.phoneNo,
+      };
+      await axios.post('/api/admin/parent', parentData, config);
+      alert('✅ Parent added successfully');
+      setFormData({ name: '', email: '', password: '', class: '10A', rollNo: '', subject: '', qualifications: '', studentId: '', relation: 'Guardian', phoneNo: '' });
+      setShowAddForm(false);
+      fetchParents();
+    } catch (error) {
+      console.error('Error adding parent:', error.response?.data || error.message);
+      alert(`❌ Error: ${error.response?.data?.message || 'Failed to add parent'}`);
     }
   };
 
@@ -140,6 +187,9 @@ const AdminDashboard = () => {
       }
     }
   };
+
+  // Helper to reset shared form
+  const resetForm = () => setFormData({ name: '', email: '', password: '', class: '10A', rollNo: '', subject: '', qualifications: '', studentId: '', relation: 'Guardian', phoneNo: '' });
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -174,6 +224,16 @@ const AdminDashboard = () => {
                   }`}
                 >
                   👩‍🏫 Teachers
+                </button>
+                <button
+                  onClick={() => setActiveTab('parents')}
+                  className={`flex-1 py-3 font-semibold ${
+                    activeTab === 'parents'
+                      ? 'border-b-2 border-blue-500 text-blue-500'
+                      : 'text-gray-600'
+                  }`}
+                >
+                  👨‍👩‍👧 Parents
                 </button>
                 <button
                   onClick={() => setActiveTab('reports')}
@@ -409,10 +469,126 @@ const AdminDashboard = () => {
               </div>
             )}
 
+            {/* Parents Tab */}
+            {activeTab === 'parents' && (
+              <div>
+                <button
+                  onClick={() => setShowAddForm(!showAddForm)}
+                  className="mb-6 bg-purple-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-purple-600"
+                >
+                  {showAddForm ? '✖️ Cancel' : '➕ Add Parent'}
+                </button>
+
+                {showAddForm && (
+                  <div className="bg-white rounded-lg shadow p-6 mb-6">
+                    <form onSubmit={handleAddParent}>
+                      <div className="grid grid-cols-2 gap-4">
+                        <input
+                          type="text"
+                          placeholder="Parent Name"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          className="px-4 py-2 border rounded-lg"
+                          required
+                        />
+                        <input
+                          type="email"
+                          placeholder="Parent Email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="px-4 py-2 border rounded-lg"
+                          required
+                        />
+                        <input
+                          type="password"
+                          placeholder="Password"
+                          value={formData.password}
+                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                          className="px-4 py-2 border rounded-lg"
+                          required
+                        />
+                        <input
+                          type="text"
+                          placeholder="Phone No"
+                          value={formData.phoneNo}
+                          onChange={(e) => setFormData({ ...formData, phoneNo: e.target.value })}
+                          className="px-4 py-2 border rounded-lg"
+                        />
+                        <select
+                          value={formData.relation}
+                          onChange={(e) => setFormData({ ...formData, relation: e.target.value })}
+                          className="px-4 py-2 border rounded-lg"
+                        >
+                          <option value="Father">Father</option>
+                          <option value="Mother">Mother</option>
+                          <option value="Guardian">Guardian</option>
+                        </select>
+                        <select
+                          value={formData.studentId}
+                          onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
+                          className="px-4 py-2 border rounded-lg"
+                          required
+                        >
+                          <option value="">-- Select Child (Student) --</option>
+                          {students.map((s) => (
+                            <option key={s._id} value={s._id}>
+                              {s.userId?.name} – {s.class} (Roll {s.rollNo})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <button
+                        type="submit"
+                        className="mt-4 bg-purple-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-purple-600"
+                      >
+                        ✅ Add Parent
+                      </button>
+                    </form>
+                  </div>
+                )}
+
+                {loading ? (
+                  <div className="text-center text-gray-500">Loading...</div>
+                ) : (
+                  <div className="bg-white rounded-lg shadow overflow-hidden">
+                    <table className="w-full">
+                      <thead className="bg-gray-200">
+                        <tr>
+                          <th className="px-4 py-2 text-left">Parent Name</th>
+                          <th className="px-4 py-2 text-left">Email</th>
+                          <th className="px-4 py-2 text-left">Relation</th>
+                          <th className="px-4 py-2 text-left">Child</th>
+                          <th className="px-4 py-2 text-left">Class</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {parents.map((parent) => (
+                          <tr key={parent._id} className="border-t hover:bg-gray-50">
+                            <td className="px-4 py-2">{parent.userId?.name}</td>
+                            <td className="px-4 py-2">{parent.userId?.email}</td>
+                            <td className="px-4 py-2">
+                              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
+                                {parent.relation}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2">{parent.studentId?.userId?.name || '—'}</td>
+                            <td className="px-4 py-2">{parent.studentId?.class || '—'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Reports Tab */}
             {activeTab === 'reports' && (
               <Reports />
             )}
+
+            {/* More / Profile Settings Tab */}
+            {activeTab === 'more' && <ProfileSettings />}
           </div>
         </div>
       </div>

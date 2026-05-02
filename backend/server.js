@@ -23,6 +23,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/student', require('./routes/studentRoutes'));
 app.use('/api/teacher', require('./routes/teacherRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/parent', require('./routes/parentRoutes'));
 
 // Health check
 app.get('/', (req, res) => {

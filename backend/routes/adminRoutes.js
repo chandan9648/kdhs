@@ -8,6 +8,8 @@ const {
   deleteStudent,
   getAttendanceReport,
   getMarksReport,
+  addParent,
+  getAllParents,
 } = require('../controllers/adminController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
@@ -27,5 +29,9 @@ router.get('/teachers', getAllTeachers);
 // Reports
 router.get('/reports/attendance', getAttendanceReport);
 router.get('/reports/marks', getMarksReport);
+
+// Parent routes
+router.post('/parent', addParent);
+router.get('/parents', getAllParents);
 
 module.exports = router;

@@ -111,3 +111,44 @@ exports.getMe = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Update logged-in user profile (name / email / password)
+// @route   PUT /api/auth/profile
+// @access  Private
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email, currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.user.id).select('+password');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Update name / email if provided
+    if (name) user.name = name;
+    if (email) user.email = email;
+
+    // Update password only when both current + new are supplied
+    if (currentPassword && newPassword) {
+      const isMatch = await user.matchPassword(currentPassword);
+      if (!isMatch) {
+        return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+      }
+      user.password = newPassword; // pre-save hook will hash it
+    }
+
+    await user.save();
+
+    // Persist updated user info to return to client
+    const updatedUser = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+
+    res.status(200).json({ success: true, user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

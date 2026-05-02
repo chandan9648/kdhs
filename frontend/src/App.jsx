@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import StudentDashboard from './pages/StudentDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import ParentDashboard from './pages/ParentDashboard';
 import './index.css';
 
 function App() {
@@ -20,6 +21,13 @@ function App() {
     }
   }, []);
 
+  const getDefaultPath = (role) => {
+    if (role === 'admin') return '/admin';
+    if (role === 'teacher') return '/teacher';
+    if (role === 'parent') return '/parent';
+    return '/student';
+  };
+
   return (
     <Router>
       <Routes>
@@ -27,7 +35,7 @@ function App() {
           path="/login"
           element={
             isAuthenticated ? (
-              <Navigate to={userRole === 'admin' ? '/admin' : userRole === 'teacher' ? '/teacher' : '/student'} />
+              <Navigate to={getDefaultPath(userRole)} />
             ) : (
               <Login setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />
             )
@@ -67,10 +75,22 @@ function App() {
           }
         />
 
-        <Route path="/" element={<Navigate to={isAuthenticated ? (userRole === 'admin' ? '/admin' : userRole === 'teacher' ? '/teacher' : '/student') : '/login'} />} />
+        <Route
+          path="/parent"
+          element={
+            isAuthenticated && userRole === 'parent' ? (
+              <ParentDashboard />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+
+        <Route path="/" element={<Navigate to={isAuthenticated ? getDefaultPath(userRole) : '/login'} />} />
       </Routes>
     </Router>
   );
 }
 
 export default App;
+

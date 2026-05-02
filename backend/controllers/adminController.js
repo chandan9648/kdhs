@@ -3,6 +3,7 @@ const Student = require('../models/Student');
 const Teacher = require('../models/Teacher');
 const Attendance = require('../models/Attendance');
 const Marks = require('../models/Marks');
+const Parent = require('../models/Parent');
 
 // @desc    Add student
 // @route   POST /api/admin/student
@@ -277,6 +278,64 @@ exports.getMarksReport = async (req, res) => {
       .sort({ createdAt: -1 });
 
     res.status(200).json({ success: true, marks });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Add parent (linked to a student)
+// @route   POST /api/admin/parent
+// @access  Private/Admin
+exports.addParent = async (req, res) => {
+  try {
+    const { name, email, password, studentId, relation, phoneNo } = req.body;
+
+    if (!name || !email || !password || !studentId) {
+      return res.status(400).json({ success: false, message: 'Please provide all required fields' });
+    }
+
+    // Ensure the student exists
+    const student = await Student.findById(studentId);
+    if (!student) {
+      return res.status(404).json({ success: false, message: 'Student not found' });
+    }
+
+    // Check email uniqueness
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ success: false, message: 'Email already exists' });
+    }
+
+    // Create user with parent role
+    user = await User.create({ name, email, password, role: 'parent' });
+
+    // Create parent profile
+    const parent = await Parent.create({
+      userId: user._id,
+      studentId,
+      relation: relation || 'Guardian',
+      phoneNo,
+    });
+
+    res.status(201).json({ success: true, user, parent });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get all parents
+// @route   GET /api/admin/parents
+// @access  Private/Admin
+exports.getAllParents = async (req, res) => {
+  try {
+    const parents = await Parent.find()
+      .populate('userId', 'name email')
+      .populate({
+        path: 'studentId',
+        populate: { path: 'userId', select: 'name' },
+      });
+
+    res.status(200).json({ success: true, parents });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

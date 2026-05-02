@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
+import ProfileSettings from '../components/ProfileSettings';
 
 const TeacherDashboard = () => {
   const [classes, setClasses] = useState(['10A', '10B', '12A', '12B']);
@@ -343,6 +344,8 @@ const TeacherDashboard = () => {
                     </div>
                   </div>
                 )}
+                {/* More / Profile Settings Tab */}
+                {activeTab === 'more' && <ProfileSettings />}
               </>
             )}
           </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
+import ProfileSettings from '../components/ProfileSettings';
 
 const StudentDashboard = () => {
   const [student, setStudent] = useState(null);
@@ -220,6 +221,8 @@ const StudentDashboard = () => {
                     </table>
                   </div>
                 )}
+                {/* More / Profile Settings Tab */}
+                {activeTab === 'more' && <ProfileSettings />}
               </>
             )}
           </div>
