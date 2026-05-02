@@ -1,6 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+// Eye icon SVGs (no library needed)
+const EyeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+    className="w-5 h-5">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const EyeOffIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+    className="w-5 h-5">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+    <line x1="1" y1="1" x2="23" y2="23" />
+  </svg>
+);
+
+// Reusable password field with show/hide toggle
+const PasswordInput = ({ id, value, onChange, placeholder, extraClass = '' }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative">
+      <input
+        id={id}
+        type={show ? 'text' : 'password'}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className={`w-full px-4 py-2.5 pr-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition ${extraClass}`}
+      />
+      <button
+        type="button"
+        onClick={() => setShow((s) => !s)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+        tabIndex={-1}
+        aria-label={show ? 'Hide password' : 'Show password'}
+      >
+        {show ? <EyeOffIcon /> : <EyeIcon />}
+      </button>
+    </div>
+  );
+};
+
 const ProfileSettings = () => {
   const token = localStorage.getItem('token');
   const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -11,10 +57,9 @@ const ProfileSettings = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ text: '', type: '' }); // type: 'success' | 'error'
+  const [message, setMessage] = useState({ text: '', type: '' });
   const [showPassSection, setShowPassSection] = useState(false);
 
-  // Auto-clear message after 4 s
   useEffect(() => {
     if (message.text) {
       const t = setTimeout(() => setMessage({ text: '', type: '' }), 4000);
@@ -26,17 +71,10 @@ const ProfileSettings = () => {
     e.preventDefault();
     setMessage({ text: '', type: '' });
 
-    // Validate password fields if the user wants to change password
     if (showPassSection) {
-      if (!currentPassword) {
-        return setMessage({ text: 'Please enter your current password.', type: 'error' });
-      }
-      if (newPassword.length < 6) {
-        return setMessage({ text: 'New password must be at least 6 characters.', type: 'error' });
-      }
-      if (newPassword !== confirmPassword) {
-        return setMessage({ text: 'New passwords do not match.', type: 'error' });
-      }
+      if (!currentPassword) return setMessage({ text: 'Please enter your current password.', type: 'error' });
+      if (newPassword.length < 6) return setMessage({ text: 'New password must be at least 6 characters.', type: 'error' });
+      if (newPassword !== confirmPassword) return setMessage({ text: 'New passwords do not match.', type: 'error' });
     }
 
     const payload = { name, email };
@@ -50,11 +88,7 @@ const ProfileSettings = () => {
       const res = await axios.put('/api/auth/profile', payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      // Update localStorage so the rest of the app stays in sync
-      const updatedUser = res.data.user;
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-
+      localStorage.setItem('user', JSON.stringify(res.data.user));
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -96,13 +130,11 @@ const ProfileSettings = () => {
 
       {/* Alert */}
       {message.text && (
-        <div
-          className={`mb-5 px-4 py-3 rounded-lg text-sm font-medium border ${
-            message.type === 'success'
-              ? 'bg-green-50 border-green-300 text-green-800'
-              : 'bg-red-50 border-red-300 text-red-800'
-          }`}
-        >
+        <div className={`mb-5 px-4 py-3 rounded-lg text-sm font-medium border ${
+          message.type === 'success'
+            ? 'bg-green-50 border-green-300 text-green-800'
+            : 'bg-red-50 border-red-300 text-red-800'
+        }`}>
           {message.text}
         </div>
       )}
@@ -156,39 +188,36 @@ const ProfileSettings = () => {
           <div className="space-y-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
             <div>
               <label className="block text-sm font-semibold text-gray-600 mb-1">Current Password</label>
-              <input
+              <PasswordInput
                 id="profile-current-password"
-                type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                 placeholder="Enter current password"
               />
             </div>
+
             <div>
               <label className="block text-sm font-semibold text-gray-600 mb-1">New Password</label>
-              <input
+              <PasswordInput
                 id="profile-new-password"
-                type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                 placeholder="Min. 6 characters"
               />
             </div>
+
             <div>
               <label className="block text-sm font-semibold text-gray-600 mb-1">Confirm New Password</label>
-              <input
+              <PasswordInput
                 id="profile-confirm-password"
-                type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition ${
+                placeholder="Repeat new password"
+                extraClass={
                   confirmPassword && confirmPassword !== newPassword
                     ? 'border-red-400 focus:ring-red-300'
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-                placeholder="Repeat new password"
+                    : ''
+                }
               />
               {confirmPassword && confirmPassword !== newPassword && (
                 <p className="text-xs text-red-500 mt-1">Passwords don't match</p>
