@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import client from '../api/client';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import Reports from '../components/Reports';
@@ -63,9 +63,6 @@ const AdminDashboard = () => {
   const [editTarget, setEditTarget] = useState(null); // { type, record }
   const [editForm, setEditForm] = useState({});
 
-  const token = localStorage.getItem('token');
-  const config = { headers: { Authorization: `Bearer ${token}` } };
-
   const [formData, setFormData] = useState(emptyForm);
 
   useEffect(() => {
@@ -75,15 +72,15 @@ const AdminDashboard = () => {
   }, [activeTab]);
 
   const fetchStudents = async () => {
-    try { setLoading(true); const r = await axios.get('/api/admin/students', config); setStudents(r.data.students); }
+    try { setLoading(true); const r = await client.get('/api/admin/students'); setStudents(r.data.students); }
     catch (e) { console.error(e); } finally { setLoading(false); }
   };
   const fetchTeachers = async () => {
-    try { setLoading(true); const r = await axios.get('/api/admin/teachers', config); setTeachers(r.data.teachers); }
+    try { setLoading(true); const r = await client.get('/api/admin/teachers'); setTeachers(r.data.teachers); }
     catch (e) { console.error(e); } finally { setLoading(false); }
   };
   const fetchParents = async () => {
-    try { setLoading(true); const r = await axios.get('/api/admin/parents', config); setParents(r.data.parents); }
+    try { setLoading(true); const r = await client.get('/api/admin/parents'); setParents(r.data.parents); }
     catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
@@ -91,30 +88,30 @@ const AdminDashboard = () => {
   const handleAddStudent = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/admin/student', {
+      await client.post('/api/admin/student', {
         name: formData.name, email: formData.email, password: formData.password,
         class: formData.class, rollNo: parseInt(formData.rollNo) || 0,
-      }, config);
+      });
       alert('✅ Student added'); setFormData(emptyForm); setShowAddForm(false); fetchStudents();
     } catch (err) { alert(`❌ ${err.response?.data?.message || 'Failed'}`); }
   };
   const handleAddTeacher = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/admin/teacher', {
+      await client.post('/api/admin/teacher', {
         name: formData.name, email: formData.email, password: formData.password,
         subject: formData.subject, qualifications: formData.qualifications,
-      }, config);
+      });
       alert('✅ Teacher added'); setFormData(emptyForm); setShowAddForm(false); fetchTeachers();
     } catch (err) { alert(`❌ ${err.response?.data?.message || 'Failed'}`); }
   };
   const handleAddParent = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/admin/parent', {
+      await client.post('/api/admin/parent', {
         name: formData.name, email: formData.email, password: formData.password,
         studentId: formData.studentId, relation: formData.relation, phoneNo: formData.phoneNo,
-      }, config);
+      });
       alert('✅ Parent added'); setFormData(emptyForm); setShowAddForm(false); fetchParents();
     } catch (err) { alert(`❌ ${err.response?.data?.message || 'Failed'}`); }
   };
@@ -123,7 +120,7 @@ const AdminDashboard = () => {
   const handleDelete = async (type, id) => {
     if (!window.confirm(`Delete this ${type}?`)) return;
     try {
-      await axios.delete(`/api/admin/${type}/${id}`, config);
+      await client.delete(`/api/admin/${type}/${id}`);
       alert(`✅ ${type.charAt(0).toUpperCase() + type.slice(1)} deleted`);
       if (type === 'student') fetchStudents();
       else if (type === 'teacher') fetchTeachers();
@@ -171,7 +168,7 @@ const AdminDashboard = () => {
     try {
       const payload = { ...editForm };
       if (type === 'student' && payload.rollNo) payload.rollNo = parseInt(payload.rollNo);
-      await axios.put(`/api/admin/${type}/${id}`, payload, config);
+      await client.put(`/api/admin/${type}/${id}`, payload);
       alert(`✅ ${type.charAt(0).toUpperCase() + type.slice(1)} updated`);
       setEditTarget(null);
       if (type === 'student') fetchStudents();

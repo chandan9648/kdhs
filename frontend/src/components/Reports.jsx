@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import client from '../api/client';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -33,7 +33,6 @@ const Reports = () => {
   const [reportType, setReportType] = useState('attendance');
   const [loading, setLoading] = useState(false);
 
-  const token = localStorage.getItem('token');
   const classes = ['10A', '10B', '12A', '12B'];
 
   useEffect(() => {
@@ -47,10 +46,8 @@ const Reports = () => {
   const fetchAttendanceReport = async () => {
     try {
       setLoading(true);
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await axios.get(
-        `/api/admin/reports/attendance?className=${selectedClass}`,
-        config
+      const res = await client.get(
+        `/api/admin/reports/attendance?className=${selectedClass}`
       );
       setAttendanceReport(res.data.report);
     } catch (error) {
@@ -63,10 +60,8 @@ const Reports = () => {
   const fetchMarksReport = async () => {
     try {
       setLoading(true);
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await axios.get(
-        `/api/admin/reports/marks?className=${selectedClass}`,
-        config
+      const res = await client.get(
+        `/api/admin/reports/marks?className=${selectedClass}`
       );
       setMarksReport(res.data.marks);
     } catch (error) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import client from '../api/client';
 
 // Eye icon SVGs (no library needed)
 const EyeIcon = () => (
@@ -48,7 +48,6 @@ const PasswordInput = ({ id, value, onChange, placeholder, extraClass = '' }) =>
 };
 
 const ProfileSettings = () => {
-  const token = localStorage.getItem('token');
   const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
 
   const [name, setName] = useState(storedUser.name || '');
@@ -85,9 +84,7 @@ const ProfileSettings = () => {
 
     try {
       setLoading(true);
-      const res = await axios.put('/api/auth/profile', payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await client.put('/api/auth/profile', payload);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       setCurrentPassword('');
       setNewPassword('');

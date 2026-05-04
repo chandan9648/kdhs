@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import client from '../api/client';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import ProfileSettings from '../components/ProfileSettings';
@@ -12,8 +12,6 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const token = localStorage.getItem('token');
-
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -24,16 +22,14 @@ const StudentDashboard = () => {
 
   const fetchStudentData = async () => {
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-
       if (activeTab === 'profile') {
-        const res = await axios.get('/api/student/profile', config);
+        const res = await client.get('/api/student/profile');
         setStudent(res.data.student);
       } else if (activeTab === 'attendance') {
-        const res = await axios.get('/api/student/attendance', config);
+        const res = await client.get('/api/student/attendance');
         setAttendance(res.data);
       } else if (activeTab === 'marks') {
-        const res = await axios.get('/api/student/marks', config);
+        const res = await client.get('/api/student/marks');
         setMarks(res.data.marks);
       }
     } catch (error) {

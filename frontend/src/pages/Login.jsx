@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import client from '../api/client';
 
 const EyeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -33,7 +33,7 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await client.post('/api/auth/login', { email, password });
 
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('role', response.data.user.role);

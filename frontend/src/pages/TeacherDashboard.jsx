@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import client from '../api/client';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import ProfileSettings from '../components/ProfileSettings';
@@ -16,8 +16,6 @@ const TeacherDashboard = () => {
   );
   const [marksData, setMarksData] = useState({});
 
-  const token = localStorage.getItem('token');
-
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -29,8 +27,7 @@ const TeacherDashboard = () => {
   const fetchClassStudents = async () => {
     try {
       setLoading(true);
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await axios.get(`/api/teacher/class/${selectedClass}`, config);
+      const res = await client.get(`/api/teacher/class/${selectedClass}`);
       setStudents(res.data.students);
     } catch (error) {
       console.error('Error fetching students:', error);
@@ -46,7 +43,6 @@ const TeacherDashboard = () => {
 
   const submitAttendance = async () => {
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
       
       if (!attendanceDate) {
         alert('❌ Please select a date');
@@ -71,15 +67,14 @@ const TeacherDashboard = () => {
         }
 
         try {
-          await axios.post(
+          await client.post(
             '/api/teacher/attendance',
             {
               studentId: student._id,
               date: attendanceDate, // YYYY-MM-DD format
               status,
               remarks: '',
-            },
-            config
+            }
           );
           successCount++;
         } catch (err) {
@@ -101,7 +96,6 @@ const TeacherDashboard = () => {
 
   const submitMarks = async () => {
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
       const subject = document.getElementById('subject')?.value?.trim();
       const examType = document.getElementById('examType')?.value;
 
@@ -139,15 +133,14 @@ const TeacherDashboard = () => {
         }
 
         try {
-          await axios.post(
+          await client.post(
             '/api/teacher/marks',
             {
               studentId: student._id,
               subject,
               marks,
               examType,
-            },
-            config
+            }
           );
           successCount++;
         } catch (err) {

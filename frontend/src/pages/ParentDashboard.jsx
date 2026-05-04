@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import client from '../api/client';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import ProfileSettings from '../components/ProfileSettings';
@@ -14,9 +14,6 @@ const ParentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const token = localStorage.getItem('token');
-  const config = { headers: { Authorization: `Bearer ${token}` } };
-
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   useEffect(() => {
@@ -27,9 +24,9 @@ const ParentDashboard = () => {
     setLoading(true);
     try {
       const [childRes, attRes, marksRes] = await Promise.all([
-        axios.get('/api/parent/child', config),
-        axios.get('/api/parent/child/attendance', config),
-        axios.get('/api/parent/child/marks', config),
+        client.get('/api/parent/child'),
+        client.get('/api/parent/child/attendance'),
+        client.get('/api/parent/child/marks'),
       ]);
       setChild(childRes.data.child);
       setRelation(childRes.data.relation);
