@@ -19,12 +19,14 @@ const studentSchema = new mongoose.Schema(
     },
     phoneNo: {
       type: String,
+      match: [/^\d{10}$/, 'Phone number must be exactly 10 digits'],
     },
     parentName: {
       type: String,
     },
     parentPhone: {
       type: String,
+      match: [/^\d{10}$/, 'Parent phone number must be exactly 10 digits'],
     },
     address: {
       type: String,

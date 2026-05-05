@@ -318,7 +318,15 @@ const AdminDashboard = () => {
                         <input style={inputStyle} placeholder="Parent Name" value={formData.name} onChange={e => setFormData({...formData,name:e.target.value})} required />
                         <input style={inputStyle} type="email" placeholder="Parent Email" value={formData.email} onChange={e => setFormData({...formData,email:e.target.value})} required />
                         <input style={inputStyle} type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({...formData,password:e.target.value})} required />
-                        <input style={inputStyle} placeholder="Phone No" value={formData.phoneNo} onChange={e => setFormData({...formData,phoneNo:e.target.value})} />
+                        <input
+                          style={inputStyle}
+                          type="tel"
+                          placeholder="Phone No (10 digits)"
+                          value={formData.phoneNo}
+                          maxLength={10}
+                          pattern="[0-9]{10}"
+                          onChange={e => setFormData({...formData, phoneNo: e.target.value.replace(/\D/g, '').slice(0, 10)})}
+                        />
                         <select style={inputStyle} value={formData.relation} onChange={e => setFormData({...formData,relation:e.target.value})}>
                           {['Father','Mother','Guardian'].map(r => <option key={r}>{r}</option>)}
                         </select>
@@ -376,9 +384,23 @@ const AdminDashboard = () => {
             {['10A','10B','12A','12B'].map(c => <option key={c}>{c}</option>)}
           </select>
           <input {...ef('rollNo')} type="number" placeholder="Roll No" />
-          <input {...ef('phoneNo')} placeholder="Phone No" />
+          <input
+            {...ef('phoneNo')}
+            type="tel"
+            placeholder="Phone No (10 digits)"
+            maxLength={10}
+            pattern="[0-9]{10}"
+            onChange={e => setEditForm({ ...editForm, phoneNo: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+          />
           <input {...ef('parentName')} placeholder="Parent Name" />
-          <input {...ef('parentPhone')} placeholder="Parent Phone" />
+          <input
+            {...ef('parentPhone')}
+            type="tel"
+            placeholder="Parent Phone (10 digits)"
+            maxLength={10}
+            pattern="[0-9]{10}"
+            onChange={e => setEditForm({ ...editForm, parentPhone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+          />
           <input {...ef('address')} placeholder="Address" style={{ ...inputStyle, gridColumn: 'span 2' }} />
         </EditModal>
       )}
@@ -390,7 +412,14 @@ const AdminDashboard = () => {
           <input {...ef('email')} type="email" placeholder="Email" />
           <input {...ef('subject')} placeholder="Subject" />
           <input {...ef('qualifications')} placeholder="Qualifications" />
-          <input {...ef('phoneNo')} placeholder="Phone No" />
+          <input
+            {...ef('phoneNo')}
+            type="tel"
+            placeholder="Phone No (10 digits)"
+            maxLength={10}
+            pattern="[0-9]{10}"
+            onChange={e => setEditForm({ ...editForm, phoneNo: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+          />
           <input {...ef('experience')} type="number" placeholder="Experience (years)" />
         </EditModal>
       )}
@@ -403,7 +432,14 @@ const AdminDashboard = () => {
           <select {...ef('relation')}>
             {['Father','Mother','Guardian'].map(r => <option key={r}>{r}</option>)}
           </select>
-          <input {...ef('phoneNo')} placeholder="Phone No" />
+          <input
+            {...ef('phoneNo')}
+            type="tel"
+            placeholder="Phone No (10 digits)"
+            maxLength={10}
+            pattern="[0-9]{10}"
+            onChange={e => setEditForm({ ...editForm, phoneNo: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+          />
           <div style={{ gridColumn: 'span 2' }}>
             <label style={{ display: 'block', marginBottom: 4, fontSize: 13, color: '#64748b', fontWeight: 600 }}>Linked Student</label>
             <select value={editForm.studentId} onChange={e => setEditForm({...editForm, studentId: e.target.value})} style={inputStyle}>

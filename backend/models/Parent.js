@@ -20,6 +20,7 @@ const parentSchema = new mongoose.Schema(
     },
     phoneNo: {
       type: String,
+      match: [/^\d{10}$/, 'Phone number must be exactly 10 digits'],
     },
   },
   { timestamps: true }
