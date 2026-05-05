@@ -2,33 +2,33 @@
 
 A comprehensive Enterprise Resource Planning (ERP) system for schools built with React, Node.js, and MongoDB.
 
-## 🚀 Features
+##  Features
 
-### 👨‍🎓 Student Module
+###  Student Module
 - View profile and personal information
 - Check attendance records with percentage calculation
 - View marks by exam type
 
-### 👩‍🏫 Teacher Module
+###  Teacher Module
 - Mark daily attendance for classes
 - Upload and manage student marks
 - View class-wise student lists
 - Access attendance reports
 
-### 🧑‍💼 Admin Dashboard
+###  Admin Dashboard
 - Manage students (add/edit/delete)
 - Manage teachers (add/edit/delete)
 - View attendance reports
 - View marks reports
 - Assign classes to teachers
 
-### 🔐 Security
+###  Security
 - JWT-based authentication
 - Role-based access control
 - Password encryption using bcryptjs
 - Protected API endpoints
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 **Frontend:**
 - React 18
@@ -44,7 +44,7 @@ A comprehensive Enterprise Resource Planning (ERP) system for schools built with
 - JWT
 - bcryptjs
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 kdhs/
@@ -93,7 +93,7 @@ kdhs/
     └── tailwind.config.js
 ```
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js (v14 or higher)
@@ -146,7 +146,7 @@ npm start
 
 App will open on `http://localhost:3000`
 
-## 📝 API Endpoints
+##  API Endpoints
 
 ### Authentication
 - `POST /api/auth/signup` - Register new user
@@ -174,7 +174,7 @@ App will open on `http://localhost:3000`
 - `GET /api/admin/reports/attendance` - Attendance report
 - `GET /api/admin/reports/marks` - Marks report
 
-## 🔐 Test Credentials
+## Test Credentials
 
 ### Admin
 - Email: admin@school.com
@@ -192,25 +192,25 @@ App will open on `http://localhost:3000`
 - Role: student
 
 
-## 🎯 Step-by-Step Build Progress
+##  Step-by-Step Build Progress
 
-✅ **Step 1:** Backend setup with Express + MongoDB
-✅ **Step 2:** JWT authentication and middleware
-✅ **Step 3:** Admin APIs (add student/teacher)
-✅ **Step 4:** Attendance system API
-✅ **Step 5:** Frontend login and dashboard UI
-✅ **Step 6:** Role-based dashboard routing
-⏳ **Step 7:** Reports & charts (upcoming)
+ **Step 1:** Backend setup with Express + MongoDB
+ **Step 2:** JWT authentication and middleware
+ **Step 3:** Admin APIs (add student/teacher)
+ **Step 4:** Attendance system API
+ **Step 5:** Frontend login and dashboard UI
+ **Step 6:** Role-based dashboard routing
+ **Step 7:** Reports & charts (upcoming)
 
-## 💡 Bonus Features (To be added)
-- 📱 Mobile responsive UI (improved)
-- 📊 Charts and graphs (Chart.js)
-- 🔔 Notification system
-- 📁 Excel import/export
-- 🖨️ Print functionality
-- 📧 Email notifications
+##  Bonus Features (To be added)
+-  Mobile responsive UI (improved)
+-  Charts and graphs (Chart.js)
+-  Notification system
+-  Excel import/export
+-  Print functionality
+-  Email notifications
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### MongoDB Connection Error
 - Ensure MongoDB is running
@@ -224,17 +224,17 @@ App will open on `http://localhost:3000`
 - Token expires in 7 days by default
 - User needs to login again
 
-## 📄 License
+##  License
 
 This project is open source and available under the MIT License.
 
-## 👥 Contributing
+##  Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📞 Support
+##  Support
 
-For support, email support@schoolerp.com or open an issue on GitHub.
+For support, email chandankkumar156@gmail.com or open an issue on GitHub.
 
 ---
 
