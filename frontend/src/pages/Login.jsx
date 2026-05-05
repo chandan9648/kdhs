@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 import client from '../api/client';
 
 const EyeIcon = () => (
@@ -39,10 +40,18 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
       localStorage.setItem('role', response.data.user.role);
       localStorage.setItem('user', JSON.stringify(response.data.user));
 
-      setIsAuthenticated(true);
-      setUserRole(response.data.user.role);
+      const role = response.data.user.role;
+      const name = response.data.user.name || role;
+      toast.success(`Welcome back, ${name}! `);
+
+      setTimeout(() => {
+        setIsAuthenticated(true);
+        setUserRole(role);
+      }, 800);
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid credentials');
+      const msg = err.response?.data?.message || 'Invalid credentials';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

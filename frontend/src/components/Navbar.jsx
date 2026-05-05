@@ -1,9 +1,13 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 
 const Navbar = ({ role, toggleSidebar, isSidebarOpen }) => {
   const handleLogout = () => {
-    localStorage.clear();
-    window.location.reload();
+    toast.info('Logged out successfully. See you soon! 👋', { autoClose: 1500 });
+    setTimeout(() => {
+      localStorage.clear();
+      window.location.reload();
+    }, 1600);
   };
 
   return (
