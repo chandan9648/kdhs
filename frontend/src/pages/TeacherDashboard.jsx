@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import client from '../api/client';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
@@ -49,12 +50,12 @@ const TeacherDashboard = () => {
     try {
       
       if (!attendanceDate) {
-        alert('❌ Please select a date');
+        toast.warning('Please select a date');
         return;
       }
 
       if (students.length === 0) {
-        alert('❌ No students found for this class');
+        toast.warning('No students found for this class');
         return;
       }
 
@@ -88,13 +89,13 @@ const TeacherDashboard = () => {
       }
 
       if (successCount > 0) {
-        alert(`✅ Attendance marked successfully for ${successCount} student(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
+        toast.success(`Attendance marked for ${successCount} student(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
       } else {
-        alert(`❌ Failed to mark attendance for all students`);
+        toast.error('Failed to mark attendance for all students');
       }
     } catch (error) {
       console.error('Error submitting attendance:', error);
-      alert(`❌ Error: ${error.response?.data?.message || 'Failed to mark attendance'}`);
+      toast.error(error.response?.data?.message || 'Failed to mark attendance');
     }
   };
 
@@ -104,17 +105,17 @@ const TeacherDashboard = () => {
       const examType = document.getElementById('examType')?.value;
 
       if (!subject) {
-        alert('❌ Please enter a subject name');
+        toast.warning('Please enter a subject name');
         return;
       }
 
       if (!examType) {
-        alert('❌ Please select an exam type');
+        toast.warning('Please select an exam type');
         return;
       }
 
       if (students.length === 0) {
-        alert('❌ No students found for this class');
+        toast.warning('No students found for this class');
         return;
       }
 
@@ -154,13 +155,13 @@ const TeacherDashboard = () => {
       }
 
       if (successCount > 0) {
-        alert(`✅ Marks uploaded successfully for ${successCount} student(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
+        toast.success(`Marks uploaded for ${successCount} student(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
       } else {
-        alert(`❌ No marks were uploaded`);
+        toast.error('No marks were uploaded');
       }
     } catch (error) {
       console.error('Error uploading marks:', error);
-      alert(`❌ Error: ${error.response?.data?.message || 'Failed to upload marks'}`);
+      toast.error(error.response?.data?.message || 'Failed to upload marks');
     }
   };
 

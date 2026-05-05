@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import client from '../api/client';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
@@ -92,8 +93,9 @@ const AdminDashboard = () => {
         name: formData.name, email: formData.email, password: formData.password,
         class: formData.class, rollNo: parseInt(formData.rollNo) || 0,
       });
-      alert('✅ Student added'); setFormData(emptyForm); setShowAddForm(false); fetchStudents();
-    } catch (err) { alert(`❌ ${err.response?.data?.message || 'Failed'}`); }
+      toast.success('Student added successfully!');
+      setFormData(emptyForm); setShowAddForm(false); fetchStudents();
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to add student'); }
   };
   const handleAddTeacher = async (e) => {
     e.preventDefault();
@@ -102,8 +104,9 @@ const AdminDashboard = () => {
         name: formData.name, email: formData.email, password: formData.password,
         subject: formData.subject, qualifications: formData.qualifications,
       });
-      alert('✅ Teacher added'); setFormData(emptyForm); setShowAddForm(false); fetchTeachers();
-    } catch (err) { alert(`❌ ${err.response?.data?.message || 'Failed'}`); }
+      toast.success('Teacher added successfully!');
+      setFormData(emptyForm); setShowAddForm(false); fetchTeachers();
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to add teacher'); }
   };
   const handleAddParent = async (e) => {
     e.preventDefault();
@@ -112,20 +115,48 @@ const AdminDashboard = () => {
         name: formData.name, email: formData.email, password: formData.password,
         studentId: formData.studentId, relation: formData.relation, phoneNo: formData.phoneNo,
       });
-      alert('✅ Parent added'); setFormData(emptyForm); setShowAddForm(false); fetchParents();
-    } catch (err) { alert(`❌ ${err.response?.data?.message || 'Failed'}`); }
+      toast.success('Parent added successfully!');
+      setFormData(emptyForm); setShowAddForm(false); fetchParents();
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to add parent'); }
   };
 
   /* ── Delete handlers ── */
   const handleDelete = async (type, id) => {
-    if (!window.confirm(`Delete this ${type}?`)) return;
-    try {
-      await client.delete(`/api/admin/${type}/${id}`);
-      alert(`✅ ${type.charAt(0).toUpperCase() + type.slice(1)} deleted`);
-      if (type === 'student') fetchStudents();
-      else if (type === 'teacher') fetchTeachers();
-      else fetchParents();
-    } catch { alert(`❌ Error deleting ${type}`); }
+    const label = type.charAt(0).toUpperCase() + type.slice(1);
+    const toastId = toast(
+      ({ closeToast }) => (
+        <div>
+          <p style={{ marginBottom: 10, fontWeight: 600 }}>Delete this {label}?</p>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={async () => {
+                closeToast();
+                try {
+                  await client.delete(`/api/admin/${type}/${id}`);
+                  toast.success(`${label} deleted successfully!`);
+                  if (type === 'student') fetchStudents();
+                  else if (type === 'teacher') fetchTeachers();
+                  else fetchParents();
+                } catch { toast.error(`Error deleting ${label}`); }
+              }}
+              style={{
+                padding: '6px 14px', background: '#ef4444', color: '#fff',
+                border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 700,
+              }}
+            >Yes, Delete</button>
+            <button
+              onClick={closeToast}
+              style={{
+                padding: '6px 14px', background: '#e2e8f0', color: '#334155',
+                border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600,
+              }}
+            >Cancel</button>
+          </div>
+        </div>
+      ),
+      { autoClose: false, closeButton: false, position: 'top-center' }
+    );
+    void toastId;
   };
 
   /* ── Open Edit Modal ── */
@@ -165,16 +196,17 @@ const AdminDashboard = () => {
   /* ── Save Edit ── */
   const handleSaveEdit = async () => {
     const { type, id } = editTarget;
+    const label = type.charAt(0).toUpperCase() + type.slice(1);
     try {
       const payload = { ...editForm };
       if (type === 'student' && payload.rollNo) payload.rollNo = parseInt(payload.rollNo);
       await client.put(`/api/admin/${type}/${id}`, payload);
-      alert(`✅ ${type.charAt(0).toUpperCase() + type.slice(1)} updated`);
+      toast.success(`${label} updated successfully!`);
       setEditTarget(null);
       if (type === 'student') fetchStudents();
       else if (type === 'teacher') fetchTeachers();
       else fetchParents();
-    } catch (err) { alert(`❌ ${err.response?.data?.message || 'Update failed'}`); }
+    } catch (err) { toast.error(err.response?.data?.message || 'Update failed'); }
   };
 
   const ef = (key) => ({ value: editForm[key] ?? '', onChange: (e) => setEditForm({ ...editForm, [key]: e.target.value }), style: inputStyle });

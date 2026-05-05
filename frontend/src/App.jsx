@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import Login from './pages/Login';
 import StudentDashboard from './pages/StudentDashboard';
@@ -88,6 +90,16 @@ function App() {
 
         <Route path="/" element={<Navigate to={isAuthenticated ? getDefaultPath(userRole) : '/login'} />} />
       </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
     </Router>
   );
 }
