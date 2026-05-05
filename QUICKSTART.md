@@ -22,24 +22,24 @@ npm start
 2. Sign up as different roles (Admin, Teacher, Student)
 3. Login and explore features
 
-## Key Steps Completed ✅
+## Key Steps Completed 
 
-1. ✅ Backend Models (User, Student, Teacher, Attendance, Marks)
-2. ✅ Authentication (JWT + Middleware)
-3. ✅ Admin APIs (CRUD operations)
-4. ✅ Teacher APIs (Attendance & Marks)
-5. ✅ Student APIs (View Data)
-6. ✅ Frontend UI (React + Tailwind)
-7. ✅ Redux Setup
-8. ✅ Role-Based Routing
+1.  Backend Models (User, Student, Teacher, Attendance, Marks)
+2.  Authentication (JWT + Middleware)
+3.  Admin APIs (CRUD operations)
+4.  Teacher APIs (Attendance & Marks)
+5.  Student APIs (View Data)
+6.  Frontend UI (React + Tailwind)
+7.  Redux Setup
+8.  Role-Based Routing
 
 ## What's Next?
 
-- 📊 Add Charts for Reports
-- 📱 Improve Mobile Responsiveness
-- 🔔 Add Notifications
-- 📊 Advanced Filtering
-- 📈 Dashboard Statistics
+-  Add Charts for Reports
+-  Improve Mobile Responsiveness
+-  Add Notifications
+-  Advanced Filtering
+-  Dashboard Statistics
 
 ## Database Setup
 
