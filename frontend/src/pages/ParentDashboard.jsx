@@ -80,8 +80,8 @@ const ParentDashboard = () => {
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center h-48">
-                <div className="text-gray-500 text-lg animate-pulse">Loading child data…</div>
+              <div className="flex items-center justify-center py-12">
+                <div className="w-10 h-10 rounded-full border-4 border-gray-200 border-t-blue-500 animate-spin" />
               </div>
             ) : (
               <>

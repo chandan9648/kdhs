@@ -257,7 +257,7 @@ const AdminDashboard = () => {
                     </form>
                   </div>
                 )}
-                {loading ? <div className="text-center text-gray-500">Loading...</div> : (
+                {loading ? <div className="flex items-center justify-center py-12"><div className="w-10 h-10 rounded-full border-4 border-gray-200 border-t-blue-500 animate-spin" /></div> : (
                   <div className="bg-white rounded-lg shadow overflow-hidden">
                     <table className="w-full">
                       <thead className="bg-gray-200">
@@ -307,7 +307,7 @@ const AdminDashboard = () => {
                     </form>
                   </div>
                 )}
-                {loading ? <div className="text-center text-gray-500">Loading...</div> : (
+                {loading ? <div className="flex items-center justify-center py-12"><div className="w-10 h-10 rounded-full border-4 border-gray-200 border-t-blue-500 animate-spin" /></div> : (
                   <div className="bg-white rounded-lg shadow overflow-hidden">
                     <table className="w-full">
                       <thead className="bg-gray-200">
@@ -371,7 +371,7 @@ const AdminDashboard = () => {
                     </form>
                   </div>
                 )}
-                {loading ? <div className="text-center text-gray-500">Loading...</div> : (
+                {loading ? <div className="flex items-center justify-center py-12"><div className="w-10 h-10 rounded-full border-4 border-gray-200 border-t-blue-500 animate-spin" /></div> : (
                   <div className="bg-white rounded-lg shadow overflow-hidden">
                     <table className="w-full">
                       <thead className="bg-gray-200">

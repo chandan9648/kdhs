@@ -110,9 +110,31 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 text-white font-semibold py-2.5 rounded-lg hover:bg-blue-600 transition disabled:bg-gray-400 mt-2"
+            className="w-full bg-blue-500 text-white font-semibold py-2.5 rounded-lg hover:bg-blue-600 transition disabled:opacity-75 mt-2 flex items-center justify-center gap-2"
           >
-            {loading ? 'Signing in…' : 'Login'}
+            {loading ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12" cy="12" r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  />
+                </svg>
+                Signing in…
+              </>
+            ) : 'Login'}
           </button>
         </form>
 

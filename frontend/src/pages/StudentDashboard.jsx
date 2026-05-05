@@ -94,7 +94,9 @@ const StudentDashboard = () => {
             </div>
 
             {loading ? (
-              <div className="text-center text-gray-500">Loading...</div>
+              <div className="flex items-center justify-center py-12">
+                <div className="w-10 h-10 rounded-full border-4 border-gray-200 border-t-blue-500 animate-spin" />
+              </div>
             ) : (
               <>
                 {/* Profile Tab */}

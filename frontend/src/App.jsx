@@ -8,11 +8,13 @@ import StudentDashboard from './pages/StudentDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ParentDashboard from './pages/ParentDashboard';
+import PageLoader from './components/PageLoader';
 import './index.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
   const [userRole, setUserRole] = useState(localStorage.getItem('role') || null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -21,6 +23,9 @@ function App() {
       setIsAuthenticated(true);
       setUserRole(role);
     }
+    // Show loader briefly on app start
+    const timer = setTimeout(() => setIsLoading(false), 1200);
+    return () => clearTimeout(timer);
   }, []);
 
   const getDefaultPath = (role) => {
@@ -29,6 +34,8 @@ function App() {
     if (role === 'parent') return '/parent';
     return '/student';
   };
+
+  if (isLoading) return <PageLoader />;
 
   return (
     <Router>
