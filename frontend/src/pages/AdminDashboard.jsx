@@ -16,22 +16,22 @@ const emptyForm = {
 const EditModal = ({ title, onClose, onSave, children }) => (
   <div style={{
     position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '12px',
   }}>
     <div style={{
-      background: '#fff', borderRadius: 14, padding: 32, width: '100%',
-      maxWidth: 560, boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+      background: '#fff', borderRadius: 14, padding: '20px', width: '100%',
+      maxWidth: 560, boxShadow: '0 20px 60px rgba(0,0,0,0.2)', maxHeight: '90vh', overflowY: 'auto',
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>{title}</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{title}</h2>
         <button onClick={onClose} style={{
           background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#94a3b8',
         }}>✕</button>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
         {children}
       </div>
-      <div style={{ marginTop: 20, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+      <div style={{ marginTop: 16, display: 'flex', gap: 10, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
         <button onClick={onClose} style={{
           padding: '8px 20px', borderRadius: 8, border: '1px solid #cbd5e1',
           background: '#f8fafc', cursor: 'pointer', fontWeight: 600, color: '#64748b',
@@ -218,16 +218,16 @@ const AdminDashboard = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar role="admin" toggleSidebar={() => setSidebarOpen(!sidebarOpen)} isSidebarOpen={sidebarOpen} />
 
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-3 sm:p-6">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">🧑‍💼 Admin Dashboard</h1>
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">🧑‍💼 Admin Dashboard</h1>
 
             {/* Tabs */}
-            <div className="bg-white rounded-lg shadow mb-6">
-              <div className="flex border-b">
+            <div className="bg-white rounded-lg shadow mb-4 sm:mb-6">
+              <div className="flex border-b overflow-x-auto scrollbar-none">
                 {['students','teachers','parents','reports'].map(tab => (
                   <button key={tab} onClick={() => { setActiveTab(tab); setShowAddForm(false); }}
-                    className={`flex-1 py-3 font-semibold ${activeTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}`}>
+                    className={`flex-shrink-0 flex-1 min-w-[70px] py-2.5 px-1 text-xs sm:text-sm font-semibold whitespace-nowrap ${activeTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-600'}`}>
                     {tab === 'students' ? '👨‍🎓 Students' : tab === 'teachers' ? '👩‍🏫 Teachers' : tab === 'parents' ? '👨‍👩‍👧 Parents' : '📊 Reports'}
                   </button>
                 ))}
@@ -242,9 +242,9 @@ const AdminDashboard = () => {
                   {showAddForm ? '✖️ Cancel' : '➕ Add Student'}
                 </button>
                 {showAddForm && (
-                  <div className="bg-white rounded-lg shadow p-6 mb-6">
+                  <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-6">
                     <form onSubmit={handleAddStudent}>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <input style={inputStyle} placeholder="Name" value={formData.name} onChange={e => setFormData({...formData,name:e.target.value})} required />
                         <input style={inputStyle} type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({...formData,email:e.target.value})} required />
                         <input style={inputStyle} type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({...formData,password:e.target.value})} required />
@@ -259,28 +259,30 @@ const AdminDashboard = () => {
                 )}
                 {loading ? <div className="flex items-center justify-center py-12"><div className="w-10 h-10 rounded-full border-4 border-gray-200 border-t-blue-500 animate-spin" /></div> : (
                   <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <table className="w-full">
+                    <div className="overflow-x-auto">
+                    <table className="w-full min-w-[520px]">
                       <thead className="bg-gray-200">
                         <tr>
-                          {['Name','Email','Class','Roll No','Phone','Actions'].map(h => <th key={h} className="px-4 py-2 text-left">{h}</th>)}
+                          {['Name','Email','Class','Roll No','Phone','Actions'].map(h => <th key={h} className="px-3 py-2 text-left text-sm">{h}</th>)}
                         </tr>
                       </thead>
                       <tbody>
                         {students.map(s => (
                           <tr key={s._id} className="border-t hover:bg-gray-50">
-                            <td className="px-4 py-2">{s.userId?.name}</td>
-                            <td className="px-4 py-2">{s.userId?.email}</td>
-                            <td className="px-4 py-2">{s.class}</td>
-                            <td className="px-4 py-2">{s.rollNo}</td>
-                            <td className="px-4 py-2">{s.phoneNo || '—'}</td>
-                            <td className="px-4 py-2 flex gap-3">
-                              <button onClick={() => openEdit('student', s)} className="text-blue-500 hover:text-blue-700 font-semibold">✏️ Edit</button>
-                              <button onClick={() => handleDelete('student', s._id)} className="text-red-500 hover:text-red-700 font-semibold">🗑️ Delete</button>
+                            <td className="px-3 py-2 text-sm">{s.userId?.name}</td>
+                            <td className="px-3 py-2 text-sm">{s.userId?.email}</td>
+                            <td className="px-3 py-2 text-sm">{s.class}</td>
+                            <td className="px-3 py-2 text-sm">{s.rollNo}</td>
+                            <td className="px-3 py-2 text-sm">{s.phoneNo || '—'}</td>
+                            <td className="px-3 py-2 flex gap-2">
+                              <button onClick={() => openEdit('student', s)} className="text-blue-500 hover:text-blue-700 font-semibold text-sm">✏️ Edit</button>
+                              <button onClick={() => handleDelete('student', s._id)} className="text-red-500 hover:text-red-700 font-semibold text-sm">🗑️</button>
                             </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 )}
               </div>
@@ -294,9 +296,9 @@ const AdminDashboard = () => {
                   {showAddForm ? '✖️ Cancel' : '➕ Add Teacher'}
                 </button>
                 {showAddForm && (
-                  <div className="bg-white rounded-lg shadow p-6 mb-6">
+                  <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-6">
                     <form onSubmit={handleAddTeacher}>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <input style={inputStyle} placeholder="Name" value={formData.name} onChange={e => setFormData({...formData,name:e.target.value})} required />
                         <input style={inputStyle} type="email" placeholder="Email" value={formData.email} onChange={e => setFormData({...formData,email:e.target.value})} required />
                         <input style={inputStyle} type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({...formData,password:e.target.value})} required />
@@ -309,28 +311,30 @@ const AdminDashboard = () => {
                 )}
                 {loading ? <div className="flex items-center justify-center py-12"><div className="w-10 h-10 rounded-full border-4 border-gray-200 border-t-blue-500 animate-spin" /></div> : (
                   <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <table className="w-full">
+                    <div className="overflow-x-auto">
+                    <table className="w-full min-w-[520px]">
                       <thead className="bg-gray-200">
                         <tr>
-                          {['Name','Email','Subject','Qualifications','Phone','Actions'].map(h => <th key={h} className="px-4 py-2 text-left">{h}</th>)}
+                          {['Name','Email','Subject','Qualifications','Phone','Actions'].map(h => <th key={h} className="px-3 py-2 text-left text-sm">{h}</th>)}
                         </tr>
                       </thead>
                       <tbody>
                         {teachers.map(t => (
                           <tr key={t._id} className="border-t hover:bg-gray-50">
-                            <td className="px-4 py-2">{t.userId?.name}</td>
-                            <td className="px-4 py-2">{t.userId?.email}</td>
-                            <td className="px-4 py-2">{t.subject}</td>
-                            <td className="px-4 py-2">{t.qualifications || '—'}</td>
-                            <td className="px-4 py-2">{t.phoneNo || '—'}</td>
-                            <td className="px-4 py-2 flex gap-3">
-                              <button onClick={() => openEdit('teacher', t)} className="text-blue-500 hover:text-blue-700 font-semibold">✏️ Edit</button>
-                              <button onClick={() => handleDelete('teacher', t._id)} className="text-red-500 hover:text-red-700 font-semibold">🗑️ Delete</button>
+                            <td className="px-3 py-2 text-sm">{t.userId?.name}</td>
+                            <td className="px-3 py-2 text-sm">{t.userId?.email}</td>
+                            <td className="px-3 py-2 text-sm">{t.subject}</td>
+                            <td className="px-3 py-2 text-sm">{t.qualifications || '—'}</td>
+                            <td className="px-3 py-2 text-sm">{t.phoneNo || '—'}</td>
+                            <td className="px-3 py-2 flex gap-2">
+                              <button onClick={() => openEdit('teacher', t)} className="text-blue-500 hover:text-blue-700 font-semibold text-sm">✏️ Edit</button>
+                              <button onClick={() => handleDelete('teacher', t._id)} className="text-red-500 hover:text-red-700 font-semibold text-sm">🗑️</button>
                             </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 )}
               </div>
@@ -344,9 +348,9 @@ const AdminDashboard = () => {
                   {showAddForm ? '✖️ Cancel' : '➕ Add Parent'}
                 </button>
                 {showAddForm && (
-                  <div className="bg-white rounded-lg shadow p-6 mb-6">
+                  <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-6">
                     <form onSubmit={handleAddParent}>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <input style={inputStyle} placeholder="Parent Name" value={formData.name} onChange={e => setFormData({...formData,name:e.target.value})} required />
                         <input style={inputStyle} type="email" placeholder="Parent Email" value={formData.email} onChange={e => setFormData({...formData,email:e.target.value})} required />
                         <input style={inputStyle} type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({...formData,password:e.target.value})} required />
@@ -373,29 +377,31 @@ const AdminDashboard = () => {
                 )}
                 {loading ? <div className="flex items-center justify-center py-12"><div className="w-10 h-10 rounded-full border-4 border-gray-200 border-t-blue-500 animate-spin" /></div> : (
                   <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <table className="w-full">
+                    <div className="overflow-x-auto">
+                    <table className="w-full min-w-[600px]">
                       <thead className="bg-gray-200">
                         <tr>
-                          {['Parent Name','Email','Relation','Phone','Child','Class','Actions'].map(h => <th key={h} className="px-4 py-2 text-left">{h}</th>)}
+                          {['Parent Name','Email','Relation','Phone','Child','Class','Actions'].map(h => <th key={h} className="px-3 py-2 text-left text-sm">{h}</th>)}
                         </tr>
                       </thead>
                       <tbody>
                         {parents.map(p => (
                           <tr key={p._id} className="border-t hover:bg-gray-50">
-                            <td className="px-4 py-2">{p.userId?.name}</td>
-                            <td className="px-4 py-2">{p.userId?.email}</td>
-                            <td className="px-4 py-2"><span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">{p.relation}</span></td>
-                            <td className="px-4 py-2">{p.phoneNo || '—'}</td>
-                            <td className="px-4 py-2">{p.studentId?.userId?.name || '—'}</td>
-                            <td className="px-4 py-2">{p.studentId?.class || '—'}</td>
-                            <td className="px-4 py-2 flex gap-3">
-                              <button onClick={() => openEdit('parent', p)} className="text-blue-500 hover:text-blue-700 font-semibold">✏️ Edit</button>
-                              <button onClick={() => handleDelete('parent', p._id)} className="text-red-500 hover:text-red-700 font-semibold">🗑️ Delete</button>
+                            <td className="px-3 py-2 text-sm">{p.userId?.name}</td>
+                            <td className="px-3 py-2 text-sm">{p.userId?.email}</td>
+                            <td className="px-3 py-2 text-sm"><span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">{p.relation}</span></td>
+                            <td className="px-3 py-2 text-sm">{p.phoneNo || '—'}</td>
+                            <td className="px-3 py-2 text-sm">{p.studentId?.userId?.name || '—'}</td>
+                            <td className="px-3 py-2 text-sm">{p.studentId?.class || '—'}</td>
+                            <td className="px-3 py-2 flex gap-2">
+                              <button onClick={() => openEdit('parent', p)} className="text-blue-500 hover:text-blue-700 font-semibold text-sm">✏️ Edit</button>
+                              <button onClick={() => handleDelete('parent', p._id)} className="text-red-500 hover:text-red-700 font-semibold text-sm">🗑️</button>
                             </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 )}
               </div>

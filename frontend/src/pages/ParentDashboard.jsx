@@ -55,12 +55,12 @@ const ParentDashboard = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar role="parent" toggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
 
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-3 sm:p-6">
           <div className="max-w-5xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">👨‍👩‍👧 Parent Dashboard</h1>
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">👨‍👩‍👧 Parent Dashboard</h1>
 
             {/* Tabs */}
-            <div className="bg-white rounded-lg shadow mb-6">
+            <div className="bg-white rounded-lg shadow mb-4 sm:mb-6">
               <div className="flex border-b">
                 {['overview', 'attendance', 'marks'].map((tab) => (
                   <button
@@ -90,18 +90,18 @@ const ParentDashboard = () => {
                   <div className="space-y-6">
                     {/* Child profile card */}
                     {child && (
-                      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl shadow-lg p-6 text-white">
-                        <div className="flex items-center gap-5">
-                          <div className="w-16 h-16 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-3xl font-bold">
+                      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl shadow-lg p-4 sm:p-6 text-white">
+                        <div className="flex flex-wrap items-center gap-4">
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-2xl sm:text-3xl font-bold flex-shrink-0">
                             {child.userId?.name?.charAt(0).toUpperCase()}
                           </div>
-                          <div>
+                          <div className="min-w-0">
                             <p className="text-sm text-purple-200 mb-1">Your Child ({relation})</p>
-                            <h2 className="text-2xl font-bold">{child.userId?.name}</h2>
-                            <p className="text-purple-200 text-sm">{child.userId?.email}</p>
+                            <h2 className="text-xl sm:text-2xl font-bold truncate">{child.userId?.name}</h2>
+                            <p className="text-purple-200 text-sm truncate">{child.userId?.email}</p>
                           </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-4 mt-6">
+                        <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-4 sm:mt-6">
                           <div className="bg-white bg-opacity-10 rounded-xl p-3 text-center">
                             <p className="text-xs text-purple-200">Class</p>
                             <p className="text-xl font-bold">{child.class}</p>

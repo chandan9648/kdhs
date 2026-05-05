@@ -53,12 +53,12 @@ const StudentDashboard = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar role="student" toggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
 
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-3 sm:p-6">
           <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">📚 Student Dashboard</h1>
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">📚 Student Dashboard</h1>
 
             {/* Tabs */}
-            <div className="bg-white rounded-lg shadow mb-6">
+            <div className="bg-white rounded-lg shadow mb-4 sm:mb-6">
               <div className="flex border-b">
                 <button
                   onClick={() => handleTabChange('profile')}
@@ -101,8 +101,8 @@ const StudentDashboard = () => {
               <>
                 {/* Profile Tab */}
                 {activeTab === 'profile' && student && (
-                  <div className="bg-white rounded-lg shadow p-6">
-                    <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <p className="text-gray-600 text-sm">Name</p>
                         <p className="text-gray-800 font-semibold">{student.userId.name}</p>
@@ -138,7 +138,7 @@ const StudentDashboard = () => {
                 {/* Attendance Tab */}
                 {activeTab === 'attendance' && attendance && (
                   <div>
-                    <div className="grid grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                       <div className="bg-white rounded-lg shadow p-4">
                         <p className="text-gray-600 text-sm">Total Days</p>
                         <p className="text-2xl font-bold text-blue-500">{attendance.totalDays}</p>
@@ -161,6 +161,7 @@ const StudentDashboard = () => {
                     </div>
 
                     <div className="bg-white rounded-lg shadow overflow-hidden">
+                      <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead className="bg-gray-200">
                           <tr>
@@ -189,6 +190,7 @@ const StudentDashboard = () => {
                           ))}
                         </tbody>
                       </table>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -196,6 +198,7 @@ const StudentDashboard = () => {
                 {/* Marks Tab */}
                 {activeTab === 'marks' && marks && (
                   <div className="bg-white rounded-lg shadow overflow-hidden">
+                    <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead className="bg-gray-200">
                         <tr>
@@ -218,6 +221,7 @@ const StudentDashboard = () => {
                         ))}
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 )}
                 {/* More / Profile Settings Tab */}

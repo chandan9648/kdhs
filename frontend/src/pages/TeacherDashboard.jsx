@@ -172,9 +172,9 @@ const TeacherDashboard = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar role="teacher" toggleSidebar={toggleSidebar} isSidebarOpen={sidebarOpen} />
 
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-3 sm:p-6">
           <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">👨‍🏫 Teacher Dashboard</h1>
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">👨‍🏫 Teacher Dashboard</h1>
 
             {/* Class Selector */}
             <div className="mb-6">
@@ -227,20 +227,18 @@ const TeacherDashboard = () => {
                 {/* Attendance Tab */}
                 {activeTab === 'attendance' && (
                   <div>
-                    <div className="bg-white rounded-lg shadow p-6 mb-6">
+                    <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
                       <div className="mb-4">
-                        <label className="block text-gray-700 font-semibold mb-2">
-                          Attendance Date
-                        </label>
+                        <label className="block text-gray-700 font-semibold mb-2">Attendance Date</label>
                         <input
                           type="date"
                           value={attendanceDate}
                           onChange={(e) => setAttendanceDate(e.target.value)}
-                          className="px-4 py-2 border rounded-lg"
+                          className="w-full sm:w-auto px-4 py-2 border rounded-lg"
                         />
                       </div>
-
-                      <table className="w-full">
+                      <div className="overflow-x-auto">
+                      <table className="w-full min-w-[300px]">
                         <thead className="bg-gray-200">
                           <tr>
                             <th className="px-4 py-2 text-left">Roll No</th>
@@ -267,6 +265,7 @@ const TeacherDashboard = () => {
                           ))}
                         </tbody>
                       </table>
+                      </div>
 
                       <button
                         onClick={submitAttendance}
@@ -281,8 +280,8 @@ const TeacherDashboard = () => {
                 {/* Marks Tab */}
                 {activeTab === 'marks' && (
                   <div>
-                    <div className="bg-white rounded-lg shadow p-6 mb-6">
-                      <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                         <div>
                           <label className="block text-gray-700 font-semibold mb-2">
                             Subject
@@ -307,7 +306,8 @@ const TeacherDashboard = () => {
                         </div>
                       </div>
 
-                      <table className="w-full">
+                      <div className="overflow-x-auto">
+                      <table className="w-full min-w-[280px]">
                         <thead className="bg-gray-200">
                           <tr>
                             <th className="px-4 py-2 text-left">Roll No</th>
@@ -334,6 +334,7 @@ const TeacherDashboard = () => {
                           ))}
                         </tbody>
                       </table>
+                      </div>
 
                       <button
                         onClick={submitMarks}

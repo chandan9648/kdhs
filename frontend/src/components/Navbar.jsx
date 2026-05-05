@@ -11,24 +11,25 @@ const Navbar = ({ role, toggleSidebar, isSidebarOpen }) => {
   };
 
   return (
-    <nav className="bg-blue-600 text-white p-4 flex justify-between items-center shadow-lg">
-      <div className="flex items-center gap-4">
+    <nav className="bg-blue-600 text-white px-3 py-3 flex justify-between items-center shadow-lg min-w-0">
+      <div className="flex items-center gap-2 min-w-0">
         {/* Hamburger Menu for Mobile */}
         <button
           onClick={toggleSidebar}
-          className="md:hidden text-2xl hover:bg-blue-700 p-2 rounded"
+          className="md:hidden flex-shrink-0 text-xl hover:bg-blue-700 p-2 rounded"
         >
           {isSidebarOpen ? '✕' : '☰'}
         </button>
-        <div className="text-lg md:text-xl font-bold truncate">
-          🎓 School ERP - {role.charAt(0).toUpperCase() + role.slice(1)} Panel
+        <div className="text-sm sm:text-base md:text-lg font-bold truncate min-w-0">
+          🎓 <span className="hidden sm:inline">School ERP - </span>
+          {role.charAt(0).toUpperCase() + role.slice(1)} Panel
         </div>
       </div>
       <button
         onClick={handleLogout}
-        className="bg-red-500 hover:bg-red-600 px-3 md:px-4 py-2 rounded font-semibold text-sm md:text-base"
+        className="flex-shrink-0 bg-red-500 hover:bg-red-600 px-2 sm:px-4 py-1.5 sm:py-2 rounded font-semibold text-xs sm:text-sm md:text-base ml-2"
       >
-        🚪 Logout
+        🚪 <span className="hidden sm:inline">Logout</span><span className="sm:hidden">Exit</span>
       </button>
     </nav>
   );

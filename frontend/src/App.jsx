@@ -23,7 +23,7 @@ function App() {
       setIsAuthenticated(true);
       setUserRole(role);
     }
-    // Show loader briefly on app start
+
     const timer = setTimeout(() => setIsLoading(false), 1200);
     return () => clearTimeout(timer);
   }, []);
@@ -35,7 +35,7 @@ function App() {
     return '/student';
   };
 
-  if (isLoading) return <PageLoader />;
+  if (isLoading) return <PageLoader message="Starting School ERP…" />;
 
   return (
     <Router>
