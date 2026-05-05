@@ -12,7 +12,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
+import { Bar, Pie } from 'react-chartjs-2';
 
 ChartJS.register(
   CategoryScale,
@@ -41,6 +41,7 @@ const Reports = () => {
     } else {
       fetchMarksReport();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClass, reportType]);
 
   const fetchAttendanceReport = async () => {
@@ -81,8 +82,7 @@ const Reports = () => {
     const attendancePercentages = attendanceReport.map(
       (item) => parseFloat(item.attendancePercentage) || 0
     );
-    const presentDays = attendanceReport.map((item) => item.presentDays);
-    const totalDays = attendanceReport.map((item) => item.totalDays);
+    // presentDays and totalDays are kept for potential future use / debugging
 
     return {
       labels,

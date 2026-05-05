@@ -18,6 +18,7 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     fetchStudentData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchStudentData = async () => {

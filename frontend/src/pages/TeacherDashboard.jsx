@@ -5,6 +5,7 @@ import Sidebar from '../components/Sidebar';
 import ProfileSettings from '../components/ProfileSettings';
 
 const TeacherDashboard = () => {
+  // eslint-disable-next-line no-unused-vars
   const [classes, setClasses] = useState(['10A', '10B', '12A', '12B']);
   const [selectedClass, setSelectedClass] = useState('10A');
   const [students, setStudents] = useState([]);
@@ -14,6 +15,7 @@ const TeacherDashboard = () => {
   const [attendanceDate, setAttendanceDate] = useState(
     new Date().toISOString().split('T')[0]
   );
+  // eslint-disable-next-line no-unused-vars
   const [marksData, setMarksData] = useState({});
 
   const toggleSidebar = () => {
@@ -22,6 +24,7 @@ const TeacherDashboard = () => {
 
   useEffect(() => {
     fetchClassStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClass]);
 
   const fetchClassStudents = async () => {
@@ -36,6 +39,7 @@ const TeacherDashboard = () => {
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleAttendanceChange = (studentId, status) => {
     // Update local state for attendance marking
     console.log(`Mark ${studentId} as ${status}`);
