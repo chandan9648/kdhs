@@ -32,7 +32,7 @@ const TeacherDashboard = () => {
     try {
       setLoading(true);
       const res = await client.get(`/api/teacher/class/${selectedClass}`);
-      setStudents(res.data.students);
+      setStudents([...(res.data.students || [])].sort((a, b) => a.rollNo - b.rollNo));
     } catch (error) {
       console.error('Error fetching students:', error);
     } finally {

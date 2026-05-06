@@ -73,7 +73,7 @@ const AdminDashboard = () => {
   }, [activeTab]);
 
   const fetchStudents = async () => {
-    try { setLoading(true); const r = await client.get('/api/admin/students'); setStudents(r.data.students); }
+    try { setLoading(true); const r = await client.get('/api/admin/students'); setStudents([...(r.data.students || [])].sort((a, b) => a.rollNo - b.rollNo)); }
     catch (e) { console.error(e); } finally { setLoading(false); }
   };
   const fetchTeachers = async () => {
